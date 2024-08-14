@@ -10,7 +10,6 @@ import time
 import os
 
 import streamlit as st
-from common.config import CONFIG
 from common.log_config import setup_logger
 from common.settings import common_settings_init
 from sidebar import sidebar
