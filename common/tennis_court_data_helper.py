@@ -73,6 +73,15 @@ def get_realtime_tennis_court_data():
     # Convert the dictionary to a DataFrame for better formatting
     df = pd.DataFrame(table_data).T
 
-    # Print the DataFrame as a table
-    print(df.to_string())
+    # Apply styles to the DataFrame
+    def highlight_cells(val):
+        if val:
+            return 'background-color: lightblue; color: black'
+        return ''
+
+    styled_df = df.style.applymap(highlight_cells)
+
+    # Display the DataFrame using Streamlit
+    st.dataframe(styled_df)
+
     return df
