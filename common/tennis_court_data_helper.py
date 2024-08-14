@@ -11,10 +11,18 @@ import requests
 import json
 import streamlit as st
 
+
 def format_data_for_markdown(data):
     markdown = ""
     for item in data:
-        for date, courts in item['content'].items():
+        # Parse the JSON content
+        try:
+            content = json.loads(item['content'])
+        except json.JSONDecodeError as e:
+            st.error(f"JSON解析错误: {e}")
+            continue
+
+        for date, courts in content.items():
             markdown += f"### {date}\n\n"
             markdown += "| Court ID | Time Slots |\n"
             markdown += "|----------|------------|\n"
@@ -23,6 +31,7 @@ def format_data_for_markdown(data):
                 markdown += f"| {court_id} | {slots_str} |\n"
             markdown += "\n"
     return markdown
+
 
 def get_realtime_tennis_court_data():
     """
@@ -47,6 +56,7 @@ def get_realtime_tennis_court_data():
         st.error(f"HTTP请求错误: {e}")
     except json.JSONDecodeError as e:
         st.error(f"JSON解析错误: {e}")
+
 
 
 
