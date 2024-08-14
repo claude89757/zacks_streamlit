@@ -19,6 +19,22 @@ from common.log_config import setup_logger
 logger = setup_logger(__name__)
 
 
+import json
+import streamlit as st
+
+def format_data_for_markdown(data):
+    markdown = ""
+    for date, courts in data.items():
+        markdown += f"### {date}\n\n"
+        markdown += "| Court ID | Time Slots |\n"
+        markdown += "|----------|------------|\n"
+        for court_id, slots in courts.items():
+            slots_str = ', '.join([f"{start} - {end}" for start, end in slots])
+            markdown += f"| {court_id} | {slots_str} |\n"
+        markdown += "\n"
+    return markdown
+
+
 def get_realtime_tennis_court_data():
     """
     获取网球场动态数据
@@ -34,9 +50,12 @@ def get_realtime_tennis_court_data():
         # 解析JSON响应
         data = response.json()
 
-    except requests.exceptions.RequestException as e:
-        print(f"HTTP请求错误: {e}")
-    except json.JSONDecodeError as e:
-        print(f"JSON解析错误: {e}")
+        # 格式化数据为Markdown
+        markdown_data = format_data_for_markdown(data)
+        st.markdown(markdown_data)
 
-    return data
+    except requests.exceptions.RequestException as e:
+        st.error(f"HTTP请求错误: {e}")
+    except json.JSONDecodeError as e:
+        st.error(f"JSON解析错误: {e}")
+
