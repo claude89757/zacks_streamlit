@@ -10,7 +10,6 @@
 import requests
 import json
 import streamlit as st
-import pandas as pd
 from datetime import datetime, timedelta
 
 
@@ -19,36 +18,35 @@ def format_data_for_markdown(data):
     dates = sorted({date for item in data for date in json.loads(item['content']).keys()})
     time_slots = [f"{hour:02}:00" for hour in range(21, 24)] + [f"{hour:02}:00" for hour in range(0, 8)]
 
-    # Create a DataFrame
-    df = pd.DataFrame(index=time_slots, columns=dates)
+    # Create a table header
+    header = "| Time Slot | " + " | ".join(dates) + " |\n"
+    header += "|-----------|" + "|".join(["-" * (len(date) + 1) for date in dates]) + "|\n"
 
-    for item in data:
-        filename = item['filename']
-        court_name = filename.split('/')[-1].split('_')[0]  # Extract court name from filename
-        content = json.loads(item['content'])
+    # Create the table rows
+    rows = []
+    for time_slot in time_slots:
+        row = [f"| {time_slot} |"]
+        for date in dates:
+            available_courts = []
+            for item in data:
+                filename = item['filename']
+                court_name = filename.split('/')[-1].split('_')[0]  # Extract court name from filename
+                content = json.loads(item['content'])
 
-        for date, courts in content.items():
-            for court_id, slots in courts.items():
-                for start, end in slots:
-                    start_hour = int(start.split(':')[0])
-                    end_hour = int(end.split(':')[0])
-                    if start_hour > 20:  # Evening hours
-                        time_slot = f"{start_hour:02}:00"
-                        if time_slot in df.index:
-                            df.at[time_slot, date] = df.at[time_slot, date] + f"{court_name}, " if pd.notna(
-                                df.at[time_slot, date]) else f"{court_name}, "
-                    else:  # Early morning hours
-                        time_slot = f"{start_hour:02}:00"
-                        if time_slot in df.index:
-                            df.at[time_slot, date] = df.at[time_slot, date] + f"{court_name}, " if pd.notna(
-                                df.at[time_slot, date]) else f"{court_name}, "
+                if date in content:
+                    courts = content[date]
+                    for court_id, slots in courts.items():
+                        for start, end in slots:
+                            if start <= time_slot < end:
+                                available_courts.append(court_name)
 
-    # Clean up the DataFrame
-    df = df.fillna('No availability')
-    for col in df.columns:
-        df[col] = df[col].str.rstrip(', ')
+            if available_courts:
+                row.append(", ".join(available_courts))
+            else:
+                row.append("No availability")
+        rows.append(" ".join(row) + " |")
 
-    return df.to_markdown()
+    return header + "\n".join(rows) + "\n"
 
 
 def get_realtime_tennis_court_data():
@@ -59,7 +57,7 @@ def get_realtime_tennis_court_data():
     data = []
     try:
         # 发送GET请求到API端点
-        api_url = F"http://{st.secrets['ZACKS']['TENNIS_HELPER_HOST_IP']}:5000/api/files"
+        api_url = f"http://{st.secrets['ZACKS']['TENNIS_HELPER_HOST_IP']}:5000/api/files"
         response = requests.get(api_url, timeout=15)
         response.raise_for_status()  # 检查请求是否成功
 
@@ -76,7 +74,4 @@ def get_realtime_tennis_court_data():
         st.error(f"JSON解析错误: {e}")
 
 
-
-
-
-
+get_realtime_tennis_court_data()
