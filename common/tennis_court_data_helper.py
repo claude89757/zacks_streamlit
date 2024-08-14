@@ -45,44 +45,42 @@ def get_realtime_tennis_court_data():
 
         for date, courts in content.items():
             if date in date_range:
-                for court, slots in courts.items():
+                for court_index, slots in courts.items():
                     for slot in slots:
                         start_time, end_time = slot
                         if start_time in table_data and date in table_data[start_time]:
                             if court_name not in table_data[start_time][date]:
-                                table_data[start_time][date] += f"{court_name} ({court}), "
+                                table_data[start_time][date] += f"{court_name}:{court_index}|"
                             else:
-                                table_data[start_time][date] += f"{court}, "
+                                table_data[start_time][date] += f"|{court_index}"
 
     # Remove trailing commas and deduplicate court names
     for time_slot in table_data:
         for date in table_data[time_slot]:
             if table_data[time_slot][date]:
-                courts = table_data[time_slot][date].split(', ')
+                court_name = table_data[time_slot][date].split(':')[0]
+                court_index_list = table_data[time_slot][date].split(':')[-1].split('|')
                 unique_courts = {}
-                for court in courts:
-                    if court:
-                        if ' (' in court:
-                            name, number = court.split(' (')
-                            number = number.rstrip(')').replace('号场', '')
-                        else:
-                            name = court
-                            number = ''
-                        if name not in unique_courts:
-                            unique_courts[name] = []
-                        if number:
-                            unique_courts[name].append(number)
+                for court_index in court_index_list:
+                    if unique_courts.get(court_name):
+                        unique_courts[court_name].append(court_index)
+                    else:
+                        unique_courts[court_name] = [court_index]
+
                 # Process the unique_courts dictionary to format the output
                 formatted_courts = []
                 for name, numbers in unique_courts.items():
-                    if numbers:
+                    if "号" in numbers[0]:
                         # If we have specific court numbers, list them
-                        formatted_courts.append(f"{name} ({', '.join(numbers)})")
+                        court_index_list = []
+                        for number in numbers:
+                            court_index_list.append(number.split('号')[0])
+                        formatted_courts.append(f"{name} ({', '.join(court_index_list)})")
                     else:
                         # If we don't have specific court numbers, just show the count
                         formatted_courts.append(f"{name} {len(numbers)}")
                 table_data[time_slot][date] = '\n'.join(formatted_courts)
-                
+
     # Convert the dictionary to a DataFrame for better formatting
     df = pd.DataFrame(table_data).T
     return df
