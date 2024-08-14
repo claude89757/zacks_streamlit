@@ -7,40 +7,29 @@
 @Software: PyCharm
 """
 
-import json
 import requests
-import subprocess
-
-import streamlit as st
-
-from common.log_config import setup_logger
-
-# Configure logger
-logger = setup_logger(__name__)
-
-
 import json
 import streamlit as st
 
 def format_data_for_markdown(data):
     markdown = ""
-    for date, courts in data.items():
-        markdown += f"### {date}\n\n"
-        markdown += "| Court ID | Time Slots |\n"
-        markdown += "|----------|------------|\n"
-        for court_id, slots in courts.items():
-            slots_str = ', '.join([f"{start} - {end}" for start, end in slots])
-            markdown += f"| {court_id} | {slots_str} |\n"
-        markdown += "\n"
+    for item in data:
+        for date, courts in item['content'].items():
+            markdown += f"### {date}\n\n"
+            markdown += "| Court ID | Time Slots |\n"
+            markdown += "|----------|------------|\n"
+            for court_id, slots in courts.items():
+                slots_str = ', '.join([f"{start} - {end}" for start, end in slots])
+                markdown += f"| {court_id} | {slots_str} |\n"
+            markdown += "\n"
     return markdown
-
 
 def get_realtime_tennis_court_data():
     """
     获取网球场动态数据
     :return:
     """
-    data = {}
+    data = []
     try:
         # 发送GET请求到API端点
         api_url = F"http://{st.secrets['ZACKS']['TENNIS_HELPER_HOST_IP']}:5000/api/files"
@@ -58,4 +47,6 @@ def get_realtime_tennis_court_data():
         st.error(f"HTTP请求错误: {e}")
     except json.JSONDecodeError as e:
         st.error(f"JSON解析错误: {e}")
+
+
 
