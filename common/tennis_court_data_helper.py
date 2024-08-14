@@ -13,7 +13,6 @@ from datetime import datetime, timedelta
 import pandas as pd
 import streamlit as st
 
-
 def get_realtime_tennis_court_data():
     api_url = f"http://{st.secrets['ZACKS']['TENNIS_HELPER_HOST_IP']}:5000/api/files"
 
@@ -46,7 +45,25 @@ def get_realtime_tennis_court_data():
                     for slot in slots:
                         start_time, end_time = slot
                         if start_time in table_data and date in table_data[start_time]:
-                            table_data[start_time][date] += f"{court_name} ({court}), "
+                            if court_name not in table_data[start_time][date]:
+                                table_data[start_time][date] += f"{court_name} ({court}), "
+                            else:
+                                table_data[start_time][date] += f"{court}, "
+
+    # Remove trailing commas and deduplicate court names
+    for time_slot in table_data:
+        for date in table_data[time_slot]:
+            if table_data[time_slot][date]:
+                courts = table_data[time_slot][date].split(', ')
+                unique_courts = {}
+                for court in courts:
+                    if court:
+                        name, number = court.split(' (')
+                        number = number.rstrip(')')
+                        if name not in unique_courts:
+                            unique_courts[name] = []
+                        unique_courts[name].append(number)
+                table_data[time_slot][date] = ', '.join([f"{name} ({', '.join(numbers)})" for name, numbers in unique_courts.items()])
 
     # Convert the dictionary to a DataFrame for better formatting
     df = pd.DataFrame(table_data).T
