@@ -26,9 +26,8 @@ def get_realtime_tennis_court_data():
     # Prepare the date range for the next 7 days
     date_range = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
 
-    # Prepare the time slots from 21:00 to 07:00 in reverse order
-    time_slots = [f"{hour:02d}:00" for hour in range(21, 24)] + [f"{hour:02d}:00" for hour in range(0, 8)]
-    time_slots.reverse()
+    # Prepare the time slots from 07:00 to 22:00
+    time_slots = [f"{hour:02d}:00" for hour in range(7, 23)]
 
     # Initialize a dictionary to hold the table data
     table_data = {time_slot: {date: '' for date in date_range} for time_slot in time_slots}
@@ -79,7 +78,7 @@ def get_realtime_tennis_court_data():
             return 'background-color: lightblue; color: black'
         return ''
 
-    styled_df = df.style.applymap(highlight_cells)
+    styled_df = df.style.applymap(highlight_cells).set_properties(**{'white-space': 'pre-wrap'})
 
     # Display the DataFrame using Streamlit
     st.dataframe(styled_df)
