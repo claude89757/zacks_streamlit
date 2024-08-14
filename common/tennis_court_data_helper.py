@@ -10,7 +10,6 @@
 import requests
 import json
 import streamlit as st
-from datetime import datetime, timedelta
 
 
 def format_data_for_markdown(data):
@@ -18,7 +17,26 @@ def format_data_for_markdown(data):
     dates = sorted({date for item in data for date in json.loads(item['content']).keys()})
     time_slots = [f"{hour:02}:00" for hour in range(21, 24)] + [f"{hour:02}:00" for hour in range(0, 8)]
 
-    # Create a table header
+    # Create a dictionary to store the data for each time slot and date
+    availability = {time_slot: {date: [] for date in dates} for time_slot in time_slots}
+
+    # Populate the availability dictionary
+    for item in data:
+        filename = item['filename']
+        court_name = filename.split('/')[-1].split('_')[0]  # Extract court name from filename
+        content = json.loads(item['content'])
+
+        for date, courts in content.items():
+            for court_id, slots in courts.items():
+                for start, end in slots:
+                    start_hour = int(start.split(':')[0])
+                    end_hour = int(end.split(':')[0])
+                    for hour in range(start_hour, end_hour + 1):
+                        time_slot = f"{hour:02}:00"
+                        if time_slot in availability:
+                            availability[time_slot][date].append(court_name)
+
+    # Create table header
     header = "| Time Slot | " + " | ".join(dates) + " |\n"
     header += "|-----------|" + "|".join(["-" * (len(date) + 1) for date in dates]) + "|\n"
 
@@ -27,23 +45,8 @@ def format_data_for_markdown(data):
     for time_slot in time_slots:
         row = [f"| {time_slot} |"]
         for date in dates:
-            available_courts = []
-            for item in data:
-                filename = item['filename']
-                court_name = filename.split('/')[-1].split('_')[0]  # Extract court name from filename
-                content = json.loads(item['content'])
-
-                if date in content:
-                    courts = content[date]
-                    for court_id, slots in courts.items():
-                        for start, end in slots:
-                            if start <= time_slot < end:
-                                available_courts.append(court_name)
-
-            if available_courts:
-                row.append(", ".join(available_courts))
-            else:
-                row.append("No availability")
+            courts = ", ".join(set(availability[time_slot][date]))
+            row.append(courts if courts else "No availability")
         rows.append(" ".join(row) + " |")
 
     return header + "\n".join(rows) + "\n"
@@ -72,6 +75,3 @@ def get_realtime_tennis_court_data():
         st.error(f"HTTP请求错误: {e}")
     except json.JSONDecodeError as e:
         st.error(f"JSON解析错误: {e}")
-
-
-get_realtime_tennis_court_data()
