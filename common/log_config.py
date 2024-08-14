@@ -1,6 +1,11 @@
 import logging
 
 
+import logging
+import os
+import sys
+
+
 def setup_logger(name=None, log_file=None, level=logging.INFO):
     """
     设置日志配置
@@ -18,8 +23,18 @@ def setup_logger(name=None, log_file=None, level=logging.INFO):
             "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
         )
 
+        # 自动生成日志文件名
+        if log_file is None:
+            script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+            log_file = f"{script_name}.log"
+
+        # 确保日志目录存在
+        log_dir = os.path.dirname(log_file)
+        if log_dir and not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+
         # 文件处理器
-        file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
+        file_handler = logging.FileHandler(log_file, mode='w', encoding='utf-8')
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
 
