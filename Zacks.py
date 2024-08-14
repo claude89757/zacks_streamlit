@@ -31,3 +31,9 @@ sidebar()
 st.title("Zacks")
 
 st.markdown("This is new Zacks Web!")
+
+
+# 读取 secrets.toml 文件中的配置信息
+secret_key = st.secrets["general"]["MY_SECRET_KEY"]
+
+st.write(f"The secret key is: {secret_key}")
