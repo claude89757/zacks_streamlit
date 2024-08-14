@@ -1,5 +1,4 @@
 import logging
-import os
 
 
 def setup_logger(name=None, log_file=None, level=logging.INFO):
@@ -10,16 +9,6 @@ def setup_logger(name=None, log_file=None, level=logging.INFO):
     :param level: 日志级别
     :return: 配置好的logger
     """
-    # 创建logs目录
-    log_dir = "logs"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
-    # 自动根据脚本名称生成日志文件名并放在logs目录下
-    if log_file is None:
-        script_name = os.path.basename(__file__).split('.')[0]  # 获取脚本名，不包括扩展名
-        log_file = os.path.join(log_dir, f"{script_name}.log")
-
     logger = logging.getLogger(name)
 
     # 检查是否已经有handler，避免重复添加
