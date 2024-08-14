@@ -7,15 +7,6 @@
 @Software: PyCharm
 """
 
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-@Time    : 2024/8/15 01:06
-@Author  : claudexie
-@File    : tennis_court_data_helper.py
-@Software: PyCharm
-"""
-
 import requests
 import json
 from datetime import datetime, timedelta
@@ -36,7 +27,7 @@ def get_realtime_tennis_court_data():
     date_range = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
 
     # Prepare the time slots from 07:00 to 22:00
-    time_slots = [f"{hour:02d}:00" for hour in range(7, 22)]
+    time_slots = [f"{hour:02d}:00" for hour in range(7, 23)]
 
     # Initialize a dictionary to hold the table data
     table_data = {time_slot: {date: '' for date in date_range} for time_slot in time_slots}
@@ -100,6 +91,6 @@ def get_realtime_tennis_court_data():
         """,
         unsafe_allow_html=True
     )
-    st.dataframe(styled_df)
+    st.dataframe(styled_df, height=None, width=800)  # Adjust the width as needed
 
     return df
