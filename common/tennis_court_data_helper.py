@@ -58,12 +58,17 @@ def get_realtime_tennis_court_data():
                 unique_courts = {}
                 for court in courts:
                     if court:
-                        name, number = court.split(' (')
-                        number = number.rstrip(')')
+                        if ' (' in court:
+                            name, number = court.split(' (')
+                            number = number.rstrip(')')
+                        else:
+                            name = court
+                            number = ''
                         if name not in unique_courts:
                             unique_courts[name] = []
-                        unique_courts[name].append(number)
-                table_data[time_slot][date] = ', '.join([f"{name} ({', '.join(numbers)})" for name, numbers in unique_courts.items()])
+                        if number:
+                            unique_courts[name].append(number)
+                table_data[time_slot][date] = ', '.join([f"{name} ({', '.join(numbers)})" if numbers else name for name, numbers in unique_courts.items()])
 
     # Convert the dictionary to a DataFrame for better formatting
     df = pd.DataFrame(table_data).T
