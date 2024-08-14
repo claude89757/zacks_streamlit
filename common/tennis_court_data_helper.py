@@ -13,7 +13,28 @@ import subprocess
 import streamlit as st
 
 
-def find_files_in_local_directory(local_path):
+def sync_and_find_files(remote_host, username, remote_path, local_path):
+    """
+    从远程服务器读取文件数据
+    :param remote_host:
+    :param username:
+    :param remote_path:
+    :param local_path:
+    :return:
+    """
+    # 构建 rsync 命令
+    rsync_command = [
+        'rsync',
+        '-avz',
+        f'{username}@{remote_host}:{remote_path}',
+        local_path
+    ]
+    # 使用 subprocess 运行 rsync 命令
+    result = subprocess.run(rsync_command, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"Error syncing files: {result.stderr}")
+        return []
+
     # 遍历本地目录，查找以 available_court.txt 结尾的文件
     matching_files = []
     for root, dirs, files in os.walk(local_path):
@@ -28,11 +49,11 @@ def find_files_in_local_directory(local_path):
                 })
     return matching_files
 
+
 def get_realtime_tennis_court_data():
     """
     获取网球场动态数据
     :return:
     """
-    data_file_infos = find_files_in_local_directory("/root")
+    data_file_infos = sync_and_find_files(st.secrets["ZACKS"]["TENNIS_HELPER_HOST_IP"], 'root', "/root", "/root")
     return data_file_infos
-
