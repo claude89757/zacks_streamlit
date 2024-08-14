@@ -9,69 +9,48 @@
 
 import requests
 import json
+from datetime import datetime, timedelta
+import pandas as pd
 import streamlit as st
 
 
-def format_data_for_markdown(data):
-    # Extract dates and time slots
-    dates = sorted({date for item in data for date in json.loads(item['content']).keys()})
-    time_slots = [f"{hour:02}:00" for hour in range(21, 24)] + [f"{hour:02}:00" for hour in range(0, 8)]
+def get_realtime_tennis_court_data():
+    api_url = f"http://{st.secrets['ZACKS']['TENNIS_HELPER_HOST_IP']}:5000/api/files"
 
-    # Create a dictionary to store the data for each time slot and date
-    availability = {time_slot: {date: [] for date in dates} for time_slot in time_slots}
+    # Fetch data from API
+    response = requests.get(api_url)
+    data = response.json()
 
-    # Populate the availability dictionary
-    for item in data:
-        filename = item['filename']
-        court_name = filename.split('/')[-1].split('_')[0]  # Extract court name from filename
-        content = json.loads(item['content'])
+    # Get today's date
+    today = datetime.today()
+
+    # Prepare the date range for the next 7 days
+    date_range = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
+
+    # Prepare the time slots from 21:00 to 07:00 in reverse order
+    time_slots = [f"{hour:02d}:00" for hour in range(21, 24)] + [f"{hour:02d}:00" for hour in range(0, 8)]
+    time_slots.reverse()
+
+    # Initialize a dictionary to hold the table data
+    table_data = {time_slot: {date: '' for date in date_range} for time_slot in time_slots}
+
+    # Process each file's content
+    for file in data:
+        content = json.loads(file['content'])
+        filename = file['filename']
+        court_name = filename.replace('/root/', '').replace('_available_court.txt', '')
 
         for date, courts in content.items():
-            for court_id, slots in courts.items():
-                for start, end in slots:
-                    start_hour = int(start.split(':')[0])
-                    end_hour = int(end.split(':')[0])
-                    for hour in range(start_hour, end_hour + 1):
-                        time_slot = f"{hour:02}:00"
-                        if time_slot in availability:
-                            availability[time_slot][date].append(court_name)
+            if date in date_range:
+                for court, slots in courts.items():
+                    for slot in slots:
+                        start_time, end_time = slot
+                        if start_time in table_data and date in table_data[start_time]:
+                            table_data[start_time][date] += f"{court_name} ({court}), "
 
-    # Create table header
-    header = "| Time Slot | " + " | ".join(dates) + " |\n"
-    header += "|-----------|" + "|".join(["-" * (len(date) + 1) for date in dates]) + "|\n"
+    # Convert the dictionary to a DataFrame for better formatting
+    df = pd.DataFrame(table_data).T
 
-    # Create the table rows
-    rows = []
-    for time_slot in time_slots:
-        row = [f"| {time_slot} |"]
-        for date in dates:
-            courts = ", ".join(set(availability[time_slot][date]))
-            row.append(courts if courts else "No availability")
-        rows.append(" ".join(row) + " |")
-
-    return header + "\n".join(rows) + "\n"
-
-
-def get_realtime_tennis_court_data():
-    """
-    获取网球场动态数据
-    :return:
-    """
-    data = []
-    try:
-        # 发送GET请求到API端点
-        api_url = f"http://{st.secrets['ZACKS']['TENNIS_HELPER_HOST_IP']}:5000/api/files"
-        response = requests.get(api_url, timeout=15)
-        response.raise_for_status()  # 检查请求是否成功
-
-        # 解析JSON响应
-        data = response.json()
-
-        # 格式化数据为Markdown
-        markdown_data = format_data_for_markdown(data)
-        st.markdown(markdown_data)
-
-    except requests.exceptions.RequestException as e:
-        st.error(f"HTTP请求错误: {e}")
-    except json.JSONDecodeError as e:
-        st.error(f"JSON解析错误: {e}")
+    # Print the DataFrame as a table
+    print(df.to_string())
+    return df
