@@ -13,7 +13,12 @@ from datetime import datetime, timedelta
 import pandas as pd
 import streamlit as st
 
+
 def get_realtime_tennis_court_data():
+    """
+    查询场地数据
+    :return:
+    """
     api_url = f"http://{st.secrets['ZACKS']['TENNIS_HELPER_HOST_IP']}:5000/api/files"
 
     # Fetch data from API
@@ -27,7 +32,7 @@ def get_realtime_tennis_court_data():
     date_range = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
 
     # Prepare the time slots from 07:00 to 22:00
-    time_slots = [f"{hour:02d}:00" for hour in range(7, 23)]
+    time_slots = [f"{hour:02d}:00" for hour in range(7, 22)]
 
     # Initialize a dictionary to hold the table data
     table_data = {time_slot: {date: '' for date in date_range} for time_slot in time_slots}
@@ -70,12 +75,5 @@ def get_realtime_tennis_court_data():
                 table_data[time_slot][date] = '\n'.join([f"{name} {len(numbers)}" if numbers else name for name, numbers in unique_courts.items()])
 
     # Convert the dictionary to a DataFrame for better formatting
-    df = pd.DataFrame(table_data).T
-
-    # Convert DataFrame to Markdown table
-    markdown_table = df.to_markdown()
-
-    # Display the Markdown table using Streamlit
-    st.markdown(markdown_table)
-
+    df = pd.DataFrame(table_data)
     return df
