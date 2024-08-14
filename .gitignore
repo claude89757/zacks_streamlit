@@ -14,3 +14,4 @@ test_*
 *.png
 *.csv
 *.json
+*.toml
