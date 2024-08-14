@@ -10,27 +10,45 @@
 import requests
 import json
 import streamlit as st
+import pandas as pd
+from datetime import datetime, timedelta
 
 
 def format_data_for_markdown(data):
-    markdown = ""
+    # Extract dates and time slots
+    dates = sorted({date for item in data for date in json.loads(item['content']).keys()})
+    time_slots = [f"{hour:02}:00" for hour in range(21, 24)] + [f"{hour:02}:00" for hour in range(0, 8)]
+
+    # Create a DataFrame
+    df = pd.DataFrame(index=time_slots, columns=dates)
+
     for item in data:
-        # Parse the JSON content
-        try:
-            content = json.loads(item['content'])
-        except json.JSONDecodeError as e:
-            st.error(f"JSON解析错误: {e}")
-            continue
+        filename = item['filename']
+        court_name = filename.split('/')[-1].split('_')[0]  # Extract court name from filename
+        content = json.loads(item['content'])
 
         for date, courts in content.items():
-            markdown += f"### {date}\n\n"
-            markdown += "| Court ID | Time Slots |\n"
-            markdown += "|----------|------------|\n"
             for court_id, slots in courts.items():
-                slots_str = ', '.join([f"{start} - {end}" for start, end in slots])
-                markdown += f"| {court_id} | {slots_str} |\n"
-            markdown += "\n"
-    return markdown
+                for start, end in slots:
+                    start_hour = int(start.split(':')[0])
+                    end_hour = int(end.split(':')[0])
+                    if start_hour > 20:  # Evening hours
+                        time_slot = f"{start_hour:02}:00"
+                        if time_slot in df.index:
+                            df.at[time_slot, date] = df.at[time_slot, date] + f"{court_name}, " if pd.notna(
+                                df.at[time_slot, date]) else f"{court_name}, "
+                    else:  # Early morning hours
+                        time_slot = f"{start_hour:02}:00"
+                        if time_slot in df.index:
+                            df.at[time_slot, date] = df.at[time_slot, date] + f"{court_name}, " if pd.notna(
+                                df.at[time_slot, date]) else f"{court_name}, "
+
+    # Clean up the DataFrame
+    df = df.fillna('No availability')
+    for col in df.columns:
+        df[col] = df[col].str.rstrip(', ')
+
+    return df.to_markdown()
 
 
 def get_realtime_tennis_court_data():
@@ -56,6 +74,8 @@ def get_realtime_tennis_court_data():
         st.error(f"HTTP请求错误: {e}")
     except json.JSONDecodeError as e:
         st.error(f"JSON解析错误: {e}")
+
+
 
 
 
