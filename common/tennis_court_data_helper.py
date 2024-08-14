@@ -7,6 +7,15 @@
 @Software: PyCharm
 """
 
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+@Time    : 2024/8/15 01:06
+@Author  : claudexie
+@File    : tennis_court_data_helper.py
+@Software: PyCharm
+"""
+
 import requests
 import json
 from datetime import datetime, timedelta
@@ -81,6 +90,16 @@ def get_realtime_tennis_court_data():
     styled_df = df.style.applymap(highlight_cells).set_properties(**{'white-space': 'pre-wrap'})
 
     # Display the DataFrame using Streamlit
+    st.markdown(
+        """
+        <style>
+        .dataframe tbody tr th, .dataframe tbody tr td {
+            white-space: pre-wrap;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     st.dataframe(styled_df)
 
     return df
