@@ -72,25 +72,10 @@ def get_realtime_tennis_court_data():
     # Convert the dictionary to a DataFrame for better formatting
     df = pd.DataFrame(table_data).T
 
-    # Apply styles to the DataFrame
-    def highlight_cells(val):
-        if val:
-            return 'background-color: lightblue; color: black'
-        return ''
+    # Convert DataFrame to Markdown table
+    markdown_table = df.to_markdown()
 
-    styled_df = df.style.applymap(highlight_cells).set_properties(**{'white-space': 'pre-wrap'})
-
-    # Display the DataFrame using Streamlit
-    st.markdown(
-        """
-        <style>
-        .dataframe tbody tr th, .dataframe tbody tr td {
-            white-space: pre-wrap;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    st.dataframe(styled_df, height=None, width=800)  # Adjust the width as needed
+    # Display the Markdown table using Streamlit
+    st.markdown(markdown_table)
 
     return df
