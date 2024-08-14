@@ -12,6 +12,10 @@ import subprocess
 
 import streamlit as st
 
+from common.log_config import setup_logger
+
+# Configure logger
+logger = setup_logger(__name__)
 
 def sync_and_find_files(remote_host, username, remote_path, local_path):
     """
@@ -32,12 +36,12 @@ def sync_and_find_files(remote_host, username, remote_path, local_path):
     # 使用 subprocess 运行 rsync 命令
     result = subprocess.run(rsync_command, capture_output=True, text=True)
     if result.returncode != 0:
-        print(f"Error syncing files: {result.stderr}")
+        logger.error(f"Error syncing files: {result.stderr}")
         return []
 
     # 遍历本地目录，查找以 available_court.txt 结尾的文件
     matching_files = []
-    for root, dirs, files in os.walk(local_path):
+    for root, dirs, files in os.walk(f"/root/{local_path}"):
         for file in files:
             if file.endswith('available_court.txt'):
                 file_path = os.path.join(root, file)
@@ -55,5 +59,5 @@ def get_realtime_tennis_court_data():
     获取网球场动态数据
     :return:
     """
-    data_file_infos = sync_and_find_files(st.secrets["ZACKS"]["TENNIS_HELPER_HOST_IP"], 'root', "/root", "/tennis")
+    data_file_infos = sync_and_find_files(st.secrets["ZACKS"]["TENNIS_HELPER_HOST_IP"], 'root', "/root", "tennis")
     return data_file_infos
