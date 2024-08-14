@@ -72,8 +72,17 @@ def get_realtime_tennis_court_data():
                             unique_courts[name] = []
                         if number:
                             unique_courts[name].append(number)
-                table_data[time_slot][date] = '\n'.join([f"{name} {len(numbers)}" if numbers else name for name, numbers in unique_courts.items()])
-
+                # Process the unique_courts dictionary to format the output
+                formatted_courts = []
+                for name, numbers in unique_courts.items():
+                    if numbers:
+                        # If we have specific court numbers, list them
+                        formatted_courts.append(f"{name} ({', '.join(numbers)})")
+                    else:
+                        # If we don't have specific court numbers, just show the count
+                        formatted_courts.append(f"{name} {len(numbers)}")
+                table_data[time_slot][date] = '\n'.join(formatted_courts)
+                
     # Convert the dictionary to a DataFrame for better formatting
     df = pd.DataFrame(table_data).T
     return df
