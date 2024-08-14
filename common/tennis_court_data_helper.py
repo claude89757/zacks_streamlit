@@ -55,5 +55,5 @@ def get_realtime_tennis_court_data():
     获取网球场动态数据
     :return:
     """
-    data_file_infos = sync_and_find_files(st.secrets["ZACKS"]["TENNIS_HELPER_HOST_IP"], 'root', "/root", "/root")
+    data_file_infos = sync_and_find_files(st.secrets["ZACKS"]["TENNIS_HELPER_HOST_IP"], 'root', "/root", "/tennis")
     return data_file_infos
