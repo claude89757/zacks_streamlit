@@ -10,10 +10,12 @@ import time
 import os
 
 import streamlit as st
-from common.config import CONFIG
+from sidebar import sidebar
+
 from common.log_config import setup_logger
 from common.settings import common_settings_init
-from sidebar import sidebar
+from common.tennis_court_data_helper import get_realtime_tennis_court_data
+
 
 # Configure logger
 logger = setup_logger(__name__)
@@ -32,8 +34,6 @@ st.title("Zacks")
 
 st.markdown("This is new Zacks Web!")
 
-
-# 读取 secrets.toml 文件中的配置信息
-secret_key = st.secrets["general"]["MY_SECRET_KEY"]
-
-st.write(f"The secret key is: {secret_key}")
+# Get realtime tennis court data
+data = get_realtime_tennis_court_data()
+st.write(data)
