@@ -61,4 +61,5 @@ def get_realtime_tennis_court_data():
     :return:
     """
     data_file_infos = sync_and_find_files(st.secrets["ZACKS"]["TENNIS_HELPER_HOST_IP"], 'root', "/root", "/tennis")
+    st.write(f"data_file_infos: {data_file_infos}")
     return data_file_infos
