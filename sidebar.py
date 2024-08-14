@@ -12,3 +12,4 @@ import streamlit as st
 def sidebar():
     # Create a component in the sidebar to display file counts
     st.sidebar.subheader("File Statistics")
+    
