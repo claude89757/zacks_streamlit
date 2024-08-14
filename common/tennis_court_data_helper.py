@@ -68,7 +68,7 @@ def get_realtime_tennis_court_data():
                             unique_courts[name] = []
                         if number:
                             unique_courts[name].append(number)
-                table_data[time_slot][date] = ', '.join([f"{name} ({', '.join(numbers)})" if numbers else name for name, numbers in unique_courts.items()])
+                table_data[time_slot][date] = ', '.join([f"{name} {len(numbers)}" if numbers else name for name, numbers in unique_courts.items()])
 
     # Convert the dictionary to a DataFrame for better formatting
     df = pd.DataFrame(table_data).T
