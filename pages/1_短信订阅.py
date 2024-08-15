@@ -115,6 +115,7 @@ def query_subscription(phone_number):
 
 # 删除订阅
 def delete_subscription(subscription_id):
+    st.write(f"deleting ...{subscription_id}")
     with FileLock(LOCK_FILE_PATH):
         df = read_csv()
         st.dataframe(df.head(100))
@@ -212,6 +213,7 @@ with tab2:
                             st.write(f"**昵称**: {row['昵称']}")
                     with col2:
                         # 删除按钮
+                        st.write(f"订阅ID: {row['订阅ID']}")
                         if st.button(f"删除订阅 {index + 1}", key=f"delete_button_{index}", type="primary"):
                             st.query_params.del_subscription_id = row['订阅ID']
                             st.session_state.del_subscription_id = row['订阅ID']
