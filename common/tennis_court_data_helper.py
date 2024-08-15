@@ -31,8 +31,8 @@ def get_realtime_tennis_court_data():
     # Prepare the date range for the next 7 days
     date_range = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
 
-    # Prepare the time slots from 07:00 to 22:00
-    time_slots = [f"{hour:02d}:00" for hour in range(7, 22)]
+    # Prepare the time slots from 07:00 to 22:00 (倒序)
+    time_slots = [f"{hour:02d}:00" for hour in range(21, 6, -1)]
 
     # Initialize a dictionary to hold the table data
     table_data = {time_slot: {date: '' for date in date_range} for time_slot in time_slots}
@@ -54,50 +54,29 @@ def get_realtime_tennis_court_data():
                             else:
                                 table_data[start_time][date] += f",{0}"
 
-    # 将数据转换为 DataFrame
-    data = []
-    dates = list(next(iter(table_data.values())).keys())
-
-    for time, schedules in table_data.items():
-        row = {"时间": time}
-        for date in dates:
-            locations = schedules.get(date, "")
-            if not locations:
-                locations = "广告位招租"
-            row[date] = locations.replace('|', '\n')
-        data.append(row)
-
-    df = pd.DataFrame(data)
-
-    # 使用 Streamlit 显示表格
-    st.dataframe(df.style.set_properties(**{'text-align': 'left'}).set_table_styles([
-        {'selector': 'thead th', 'props': 'background-color: lightgrey; font-weight: bold;'},
-        {'selector': 'tbody td', 'props': 'text-align: left;'}
-    ]))
-
-
     # 将数据转换为 HTML 表格格式
     html_table = """
-    <table border="1" style="width:100%; text-align:center;">
-      <thead>
-        <tr>
-          <th>时间</th>
+        <table border="1" style="width:100%; text-align:center;">
+          <thead>
+            <tr>
+              <th style="background-color: #f2f2f2;">时间</th>
     """
 
     # 动态获取日期列标题
     dates = list(next(iter(table_data.values())).keys())
     for date in dates:
-        html_table += f"<th style='width:auto;'>{date}</th>"
+        html_table += f"<th style='background-color: #f2f2f2; width:auto;'>{date}</th>"
 
     html_table += """
-        </tr>
-      </thead>
-      <tbody>
+            </tr>
+          </thead>
+          <tbody>
     """
 
     # 添加每个时间段的数据
-    for time, schedules in table_data.items():
-        html_table += f"<tr><td style='text-align:left;'>{time}</td>"
+    for time in time_slots:
+        schedules = table_data[time]
+        html_table += f"<tr><td style='background-color: #f2f2f2; text-align:left;'>{time}</td>"
         for date in dates:
             locations = schedules.get(date, "")
             if not locations:
@@ -108,42 +87,10 @@ def get_realtime_tennis_court_data():
         html_table += "</tr>"
 
     html_table += """
-      </tbody>
-    </table>
+          </tbody>
+        </table>
     """
 
     # 使用 Streamlit 显示表格
     st.markdown(html_table, unsafe_allow_html=True)
 
-    # # Remove trailing commas and deduplicate court names
-    # for time_slot in table_data:
-    #     for date in table_data[time_slot]:
-    #         if table_data[time_slot][date]:
-    #             courts = table_data[time_slot][date].split(', ')
-    #             unique_courts = {}
-    #             for court in courts:
-    #                 if court:
-    #                     if ' (' in court:
-    #                         name, number = court.split(' (')
-    #                         number = number.rstrip(')').replace('号场', '')
-    #                     else:
-    #                         name = court
-    #                         number = ''
-    #                     if name not in unique_courts:
-    #                         unique_courts[name] = []
-    #                     if number:
-    #                         unique_courts[name].append(number)
-    #             # Process the unique_courts dictionary to format the output
-    #             formatted_courts = []
-    #             for name, numbers in unique_courts.items():
-    #                 if numbers:
-    #                     # If we have specific court numbers, list them
-    #                     formatted_courts.append(f"{name} ({', '.join(numbers)})")
-    #                 else:
-    #                     # If we don't have specific court numbers, just show the count
-    #                     formatted_courts.append(f"{name} {len(numbers)}")
-    #             table_data[time_slot][date] = '\n'.join(formatted_courts)
-
-    # Convert the dictionary to a DataFrame for better formatting
-    df = pd.DataFrame(table_data).T
-    return df
