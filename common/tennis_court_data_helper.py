@@ -29,8 +29,9 @@ def get_realtime_tennis_court_data():
     today = datetime.today()
     current_hour = today.strftime('%H:00')
 
-    # Prepare the date range for the next 7 days
+    # Prepare the date range for the next 7 days and their weekday names
     date_range = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
+    weekdays = [(today + timedelta(days=i)).strftime('%A') for i in range(7)]
 
     # Prepare the time slots from 07:00 to 22:00 (倒序)
     time_slots = [f"{hour:02d}:00" for hour in range(21, 6, -1)]
@@ -60,13 +61,12 @@ def get_realtime_tennis_court_data():
         <table border="1" style="width:100%; text-align:center;">
           <thead>
             <tr>
-              <th style="background-color: #f2f2f2;">时间</th>
+              <th style="background-color: #f2f2f2;">刷新</th>
     """
 
-    # 动态获取日期列标题
-    dates = list(next(iter(table_data.values())).keys())
-    for date in dates:
-        html_table += f"<th style='background-color: #f2f2f2; width:auto;'>{date}</th>"
+    # 动态获取日期列标题和星期名称
+    for weekday, date in zip(weekdays, date_range):
+        html_table += f"<th style='background-color: #f2f2f2; width:auto;'>{weekday}<br>{date}</th>"
 
     html_table += """
             </tr>
@@ -77,16 +77,16 @@ def get_realtime_tennis_court_data():
     # 添加每个时间段的数据
     for time in time_slots:
         # 判断是否为过去或当前小时
-        background_color = "#d3d3d3" if time <= current_hour else "white"
+        cell_background_color = "#d3d3d3" if time <= current_hour else "white"
         schedules = table_data[time]
-        html_table += f"<tr><td style='background-color: {background_color}; text-align:left;'>{time}</td>"
-        for date in dates:
+        html_table += f"<tr><td style='background-color: #f2f2f2; text-align:left;'>{time}</td>"
+        for date in date_range:
             locations = schedules.get(date, "")
             if not locations:
                 locations = "广告位招租"  # 显示“广告位招租”占位符
             # 使用 <br> 实现自动换行并将内容左对齐
             locations = locations.replace('|', '<br>')
-            html_table += f"<td style='width:auto; text-align:left;'>{locations}</td>"
+            html_table += f"<td style='background-color: {cell_background_color}; width:auto; text-align:left;'>{locations}</td>"
         html_table += "</tr>"
 
     html_table += """
