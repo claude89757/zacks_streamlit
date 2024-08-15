@@ -82,7 +82,7 @@ def get_realtime_tennis_court_data():
         schedules = table_data[time]
         html_table += f"<tr><td style='background-color: #f2f2f2; text-align:left;'>{time}</td>"
         for date in date_range:
-            cell_background_color = "#d3d3d3" if time <= current_hour and today in data else "white"
+            cell_background_color = "#d3d3d3" if time <= current_hour and today_str in data else "white"
             locations = schedules.get(date, "")
             if not locations:
                 locations = "广告位招租"  # 显示“广告位招租”占位符
