@@ -34,7 +34,7 @@ st.title("空场短信提醒")
 # 初始化 session state
 if 'phone_number' not in st.session_state:
     st.session_state.phone_number = ''
-    
+
 # 订阅的字段
 FIELDS = [
     "订阅场地", "开始日期", "结束日期", "开始时间", "结束时间", "最短时长", "订阅状态",
@@ -57,6 +57,7 @@ LOCK_FILE_PATH = "subscriptions.lock"
 # 文件锁
 lock = FileLock(LOCK_FILE_PATH)
 
+
 # 读取 CSV 文件
 def read_csv(CSV_FILE_PATH):
     with lock:
@@ -66,10 +67,12 @@ def read_csv(CSV_FILE_PATH):
             df.to_csv(CSV_FILE_PATH, index=False)
         return pd.read_csv(CSV_FILE_PATH)
 
+
 # 写入 CSV 文件
 def write_csv(df):
     with lock:
         df.to_csv(CSV_FILE_PATH, index=False)
+
 
 # 创建订阅
 def create_subscription(data, CSV_FILE_PATH):
@@ -81,6 +84,7 @@ def create_subscription(data, CSV_FILE_PATH):
         write_csv(df)
         time.sleep(1)
 
+
 # 查询订阅
 def query_subscription(phone_number, CSV_FILE_PATH):
     with st.spinner("querying subscription..."):
@@ -90,13 +94,12 @@ def query_subscription(phone_number, CSV_FILE_PATH):
         time.sleep(1)
         return results
 
+
 # 删除订阅
 def delete_subscription(subscription_id, CSV_FILE_PATH):
     with st.spinner("deleting subscription..."):
         df = read_csv(CSV_FILE_PATH)
-        st.write(df.head(100))
         df = df[df["订阅ID"] != subscription_id]
-        st.write(df.head(100))
         write_csv(df)
         time.sleep(1)
 
