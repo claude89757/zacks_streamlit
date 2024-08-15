@@ -1,6 +1,8 @@
 import streamlit as st
 import os
 import json
+from PIL import Image
+from io import BytesIO
 from common.log_config import setup_logger
 from common.settings import common_settings_init
 from sidebar import sidebar
@@ -17,15 +19,27 @@ common_settings_init()
 # Init sidebar
 sidebar()
 
-# Define the directory to store the tennis court info
+# Define the directory to store the tennis court info and photos
 info_dir = "tennis_court_infos"
+photos_dir = os.path.join(info_dir, "photos")
 if not os.path.exists(info_dir):
     os.makedirs(info_dir)
+if not os.path.exists(photos_dir):
+    os.makedirs(photos_dir)
 
 def save_court_info(info):
     filename = os.path.join(info_dir, f"{info['name']}.json")
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(info, f, ensure_ascii=False, indent=4)
+
+def save_photos(files):
+    photo_paths = []
+    for file in files:
+        file_path = os.path.join(photos_dir, file.name)
+        with open(file_path, "wb") as f:
+            f.write(file.getvalue())
+        photo_paths.append(file_path)
+    return photo_paths
 
 # Render Streamlit pages
 st.title("网球场信息")
@@ -48,6 +62,9 @@ with st.form(key="court_form"):
 
     if submit_button:
         if name:
+            photo_paths = []
+            if photos:
+                photo_paths = save_photos(photos)
             court_info = {
                 "name": name,
                 "address": address,
@@ -58,7 +75,7 @@ with st.form(key="court_form"):
                 "court_type": court_type,
                 "contact": contact,
                 "notes": notes,
-                "photos": [photo.name for photo in photos]
+                "photos": [os.path.basename(path) for path in photo_paths]
             }
             save_court_info(court_info)
             st.success("信息已保存！")
@@ -84,4 +101,8 @@ for file in files:
             st.write(f"备注: {court_info['notes']}")
             if court_info["photos"]:
                 for photo in court_info["photos"]:
-                    st.image(os.path.join(info_dir, photo))
+                    photo_path = os.path.join(photos_dir, photo)
+                    if os.path.exists(photo_path):
+                        st.image(photo_path)
+                    else:
+                        st.error(f"无法找到图片: {photo_path}")
