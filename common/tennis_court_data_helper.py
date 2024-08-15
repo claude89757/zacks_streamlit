@@ -56,6 +56,15 @@ def get_realtime_tennis_court_data():
                                 table_data[start_time][date] += f"|{court_index}"
     st.write(table_data)
 
+    # Displaying the data in a table format using Markdown
+    for time, schedules in table_data.items():
+        st.markdown(f"### {time}")
+        for date, locations in schedules.items():
+            if locations:
+                st.markdown(f"**{date}**: {locations}")
+            else:
+                st.markdown(f"**{date}**: No available locations")
+
     # # Remove trailing commas and deduplicate court names
     # for time_slot in table_data:
     #     for date in table_data[time_slot]:
