@@ -28,6 +28,7 @@ def get_realtime_tennis_court_data():
     # Get today's date and current time
     today = datetime.today()
     current_hour = today.strftime('%H:00')
+    current_date = today.strftime('%Y-%m-%d')
 
     # Prepare the date range for the next 7 days and their weekday names
     date_range = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
@@ -76,17 +77,21 @@ def get_realtime_tennis_court_data():
 
     # 添加每个时间段的数据
     for time in time_slots:
-        # 判断是否为过去或当前小时
-        cell_background_color = "#d3d3d3" if time <= current_hour else "white"
         schedules = table_data[time]
-        html_table += f"<tr><td style='background-color: #f2f2f2; text-align:left;'>{time}</td>"
         for date in date_range:
+            # 计算当前时间点是否已过去
+            datetime_str = f"{date} {time}"
+            cell_datetime = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M')
+            background_color = "#d3d3d3" if cell_datetime <= today else "white"
+
             locations = schedules.get(date, "")
             if not locations:
                 locations = "广告位招租"  # 显示“广告位招租”占位符
             # 使用 <br> 实现自动换行并将内容左对齐
             locations = locations.replace('|', '<br>')
-            html_table += f"<td style='background-color: {cell_background_color}; width:auto; text-align:left;'>{locations}</td>"
+
+            html_table += f"<tr><td style='background-color: #f2f2f2; text-align:left;'>{time}</td>"
+            html_table += f"<td style='background-color: {background_color}; width:auto; text-align:left;'>{locations}</td>"
         html_table += "</tr>"
 
     html_table += """
