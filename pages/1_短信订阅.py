@@ -200,7 +200,7 @@ with tab2:
 # 删除订阅 TAB
 with tab3:
     st.header("删除订阅")
-    phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
+    phone_number = st.text_input("输入手机", key="input_phone_02", value=st.session_state.phone_number)
     st.session_state.phone_number = phone_number
 
     if st.button("查询订阅", key="query_button_02"):
