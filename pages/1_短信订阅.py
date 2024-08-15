@@ -97,14 +97,15 @@ def query_subscription(phone_number):
 
 
 # 删除订阅
-def delete_subscription(phone_number):
+def delete_subscription(phone_number, index):
     df = read_csv()
-    df = df[df["手机号"] != phone_number]
+    df = df[df["手机号"] != phone_number].reset_index(drop=True)
+    df = df.drop(index).reset_index(drop=True)
     write_csv(df)
 
 
 # Streamlit 页面布局
-tab1, tab2, tab3 = st.tabs(["创建订阅", "查询订阅", "删除订阅"])
+tab1, tab2 = st.tabs(["创建订阅", "查询订阅"])
 
 # 创建订阅 TAB
 with tab1:
@@ -175,31 +176,8 @@ with tab2:
                     st.write(f"**创建时间**: {row['创建时间']}")
                     st.write(f"**昵称**: {row['昵称']}")
 
-# 删除订阅 TAB
-# 删除订阅 TAB
-with tab3:
-    st.header("删除订阅")
-    phone_number = st.text_input("输入手机号", value=st.session_state.phone_number)
-    if st.button("查询订阅", key="query_button_02"):
-        st.session_state.results = query_subscription(phone_number)
-        st.session_state.phone_number = phone_number
-
-    results = st.session_state.results
-    if not results.empty:
-        def format_subscription(index):
-            row = results.loc[index]
-            return f"{row['订阅场地']} - {row['订阅状态']} - {row['开始日期']}至{row['结束日期']}"
-
-        st.session_state.selected_subscriptions = st.multiselect(
-            "选择要删除的订阅",
-            results.index,
-            format_func=format_subscription
-        )
-
-        if st.button("删除订阅", type='primary'):
-            delete_subscription(results.loc[st.session_state.selected_subscriptions, "手机号"].tolist())
-            st.success("订阅删除成功！")
-            st.session_state.results = pd.DataFrame()  # 清空查询结果
-            st.session_state.selected_subscriptions = []  # 清空选中的订阅
-    else:
-        st.warning("未找到匹配的订阅。")
+                    # 删除按钮
+                    if st.button(f"删除订阅 {index + 1}", key=f"delete_button_{index}"):
+                        delete_subscription(phone_number, index)
+                        st.success(f"订阅 {index + 1} 已删除")
+                        st.rerun()
