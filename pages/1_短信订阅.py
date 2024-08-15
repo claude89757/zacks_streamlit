@@ -145,7 +145,7 @@ with tab1:
 # 查询订阅 TAB
 with tab2:
     st.header("查询订阅")
-    phone_number = st.text_input("输入手机号")
+    phone_number = st.text_input("输入手机")
     if st.button("查询"):
         results = query_subscription(phone_number)
         if results.empty:
