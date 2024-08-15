@@ -12,3 +12,5 @@ import streamlit as st
 def sidebar():
     # Create a component in the sidebar to display file counts
     st.sidebar.subheader("Statistics")
+    st.write(st.session_state)
+    st.write(st.query_params)
