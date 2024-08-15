@@ -68,7 +68,12 @@ def get_realtime_tennis_court_data():
 
     # 动态获取日期列标题和星期名称
     for weekday, date in zip(weekdays, date_range):
-        html_table += f"<th style='background-color: #B0E0E6; width:auto;'>{weekday}<br>{date[5:]}</th>"
+        weekday_cn = {'Monday': '星期一', 'Tuesday': '星期二', 'Wednesday': '星期三', 'Thursday': '星期四',
+                      'Friday': '星期五', 'Saturday': '星期六', 'Sunday': '星期日'}[weekday]
+        if weekday in ["星期六", "星期日"]:
+            html_table += f"<th style='background-color: #00BFFF; width:auto;'>{weekday}<br>{date[5:]}</th>"
+        else:
+            html_table += f"<th style='background-color: #7DF9FF; width:auto;'>{weekday}<br>{date[5:]}</th>"
 
     html_table += """
             </tr>
