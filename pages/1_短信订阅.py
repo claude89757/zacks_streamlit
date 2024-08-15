@@ -100,9 +100,9 @@ def query_subscription(phone_number, csv_file_path):
 def delete_subscription(subscription_id, csv_file_path):
     with st.spinner("deleting subscription..."):
         df = read_csv(csv_file_path)
-        st.dataframe(df.head(100))
+        st.write(df.head(100))
         df = df[df["订阅ID"] != subscription_id]
-        st.dataframe(df.head(100))
+        st.write(df.head(100))
         write_csv(df)
         time.sleep(3)
 
