@@ -189,26 +189,24 @@ with tab2:
                 st.warning("未找到相关订阅信息，请检查手机号是否正确。")
             else:
                 for index, row in results.iterrows():
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        with st.expander(f"订阅 {index + 1}: {row['订阅场地']} {row['订阅状态']}"):
-                            st.write(f"**开始日期**: {row['开始日期']}")
-                            st.write(f"**结束日期**: {row['结束日期']}")
-                            st.write(f"**开始时间**: {row['开始时间']}")
-                            st.write(f"**结束时间**: {row['结束时间']}")
-                            st.write(f"**最短时长**: {row['最短时长']}")
-                            st.write(f"**今天短信**: {row['今天短信']}")
-                            st.write(f"**累计短信**: {row['累计短信']}")
-                            st.write(f"**手机尾号**: {row['手机尾号']}")
-                            st.write(f"**用户等级**: {row['用户等级']}")
-                            st.write(f"**创建时间**: {row['创建时间']}")
-                            st.write(f"**昵称**: {row['昵称']}")
-                    with col2:
-                        # 删除按钮
-                        st.write(f"订阅ID: {row['订阅ID']}")
-                        if st.button(f"删除订阅 {index + 1}", type="primary"):
-                            st.warning("????????????")
-                            st.query_params.del_subscription_id = row['订阅ID']
-                            st.session_state.del_subscription_id = row['订阅ID']
-                            time.sleep(3)
-                            st.rerun()
+                    with st.expander(f"订阅 {index + 1}: {row['订阅场地']} {row['订阅状态']}"):
+                        st.write(f"**开始日期**: {row['开始日期']}")
+                        st.write(f"**结束日期**: {row['结束日期']}")
+                        st.write(f"**开始时间**: {row['开始时间']}")
+                        st.write(f"**结束时间**: {row['结束时间']}")
+                        st.write(f"**最短时长**: {row['最短时长']}")
+                        st.write(f"**今天短信**: {row['今天短信']}")
+                        st.write(f"**累计短信**: {row['累计短信']}")
+                        st.write(f"**手机尾号**: {row['手机尾号']}")
+                        st.write(f"**用户等级**: {row['用户等级']}")
+                        st.write(f"**创建时间**: {row['创建时间']}")
+                        st.write(f"**昵称**: {row['昵称']}")
+
+                # 删除按钮
+                st.write(f"订阅ID: {row['订阅ID']}")
+                if st.button(f"删除订阅 {index + 1}", type="primary"):
+                    st.warning("????????????")
+                    st.query_params.del_subscription_id = row['订阅ID']
+                    st.session_state.del_subscription_id = row['订阅ID']
+                    time.sleep(3)
+                    st.rerun()
