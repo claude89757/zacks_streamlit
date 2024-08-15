@@ -80,7 +80,7 @@ def get_realtime_tennis_court_data():
         for date in dates:
             locations = schedules.get(date, "")
             if not locations:
-                locations = "广告位招租"  # 显示“广告位招租”占位符
+                locations = ""  # 显示“广告位招租”占位符
             # 使用 <br> 实现自动换行并将内容左对齐
             locations = locations.replace('|', '<br>')
             html_table += f"<td style='width:auto; text-align:left;'>{locations}</td>"
