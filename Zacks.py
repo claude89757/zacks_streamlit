@@ -30,10 +30,7 @@ common_settings_init()
 sidebar()
 
 # Render Streamlit pages
-st.subheader("深圳热门网球场实时动态")
-
-st.markdown("场地预定方式请看侧边栏")
+st.title("深圳热门网球场实时动态")
 
 # Get realtime tennis court data
 data_df = get_realtime_tennis_court_data()
-st.dataframe(data_df)
