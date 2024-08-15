@@ -11,44 +11,50 @@ import json
 import os
 from datetime import datetime
 
-# Define the path to the local file where we will store the data
-DATA_FILE = "app_data.json"
-
-# Initialize the data structure
-if not os.path.exists(DATA_FILE):
-    data = {
-        "total_visits": 0,
-        "monthly_visits": {},
-        "daily_visits": {},
-        "users": []
-    }
-    with open(DATA_FILE, "w") as f:
-        json.dump(data, f)
-else:
-    with open(DATA_FILE, "r") as f:
-        data = json.load(f)
-
 # Get the current date and month
 current_date = datetime.now().strftime("%Y-%m-%d")
 current_month = datetime.now().strftime("%Y-%m")
 
-# Update the visit counts
-data["total_visits"] += 1
-data["daily_visits"][current_date] = data["daily_visits"].get(current_date, 0) + 1
-data["monthly_visits"][current_month] = data["monthly_visits"].get(current_month, 0) + 1
 
-# Update the user count
-if "phone_number" in st.session_state:
-    data["users"].append(st.session_state["phone_number"])
+def update_app_statistics():
+    # Define the path to the local file where we will store the data
+    DATA_FILE = "app_data.json"
 
-# Save the updated data back to the file
-data["users"] = list(data["users"])  # Convert set to list for JSON serialization
-with open(DATA_FILE, "w") as f:
-    json.dump(data, f)
+    # Initialize the data structure
+    if not os.path.exists(DATA_FILE):
+        data = {
+            "total_visits": 0,
+            "monthly_visits": {},
+            "daily_visits": {},
+            "users": []
+        }
+        with open(DATA_FILE, "w") as f:
+            json.dump(data, f)
+    else:
+        with open(DATA_FILE, "r") as f:
+            data = json.load(f)
+
+    # Update the visit counts
+    data["total_visits"] += 1
+    data["daily_visits"][current_date] = data["daily_visits"].get(current_date, 0) + 1
+    data["monthly_visits"][current_month] = data["monthly_visits"].get(current_month, 0) + 1
+
+    # Update the user count
+    if "phone_number" in st.session_state:
+        data["users"].append(st.session_state["phone_number"])
+
+    # Save the updated data back to the file
+    data["users"] = list(data["users"])  # Convert set to list for JSON serialization
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f)
+
+    return data
 
 
 # Sidebar component to display the statistics
 def sidebar():
+    data = update_app_statistics()
+
     st.sidebar.subheader("App Statistics")
 
     # Create columns for a more compact layout

@@ -150,6 +150,8 @@ with tab1:
         if not subscription_data["手机号"].isdigit() or len(subscription_data["手机号"]) != 11:
             st.error("请输入有效的11位手机号")
         else:
+            # 统计数据
+            sidebar()
             # CSV 文件路径
             create_subscription(subscription_data, CSV_FILE_PATH)
             value = st.session_state.phone_number = subscription_data["手机号"]
