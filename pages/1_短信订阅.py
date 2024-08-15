@@ -46,8 +46,8 @@ if 'results' not in st.session_state:
     st.session_state.results = pd.DataFrame()
 if 'selected_subscriptions' not in st.session_state:
     st.session_state.selected_subscriptions = []
-if 'query_triggered' not in st.session_state:
-    st.session_state.query_triggered = False
+if 'del_subscription_id' not in st.session_state:
+    st.session_state.del_subscription_id = ""
 
 
 # 订阅的字段
@@ -173,15 +173,20 @@ with tab1:
             st.balloons()
             st.success("订阅创建成功！请关注手机短信提醒。")
 
+st.write(f"del_subscription_id: {st.session_state.del_subscription_id}")
 
 # 查询订阅 TAB
 with tab2:
     st.header("查询订阅")
     phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
+    st.session_state.phone_number = phone_number
 
-    if st.button("查询订阅", key="query_button_01") or st.session_state.query_triggered:
-        st.session_state.phone_number = phone_number
-        st.session_state.query_triggered = False
+    if st.session_state.del_subscription_id:
+        delete_subscription(st.session_state.del_subscription_id)
+        st.success(f"订阅  {st.session_state.del_subscription_id} 已删除")
+        st.session_state.del_subscription_id = ""
+
+    if st.button("查询订阅", key="query_button_01"):
         results = query_subscription(phone_number)
         if results.empty:
             st.warning("未找到相关订阅信息，请检查手机号是否正确。")
@@ -202,8 +207,4 @@ with tab2:
 
                     # 删除按钮
                     if st.button(f"删除订阅 {index + 1}", key=f"delete_button_{index}"):
-                        delete_subscription(row['订阅ID'])  # 使用订阅ID进行删除
-                        st.session_state.query_triggered = True
-                        st.success(f"订阅 {index + 1} 已删除, ID: {row['订阅ID']}")
-                        time.sleep(10)
-                        # st.rerun()  # 重新运行以刷新页面
+                        st.session_state.del_subscription_id = row['订阅ID']
