@@ -55,20 +55,20 @@ def get_realtime_tennis_court_data():
                                 table_data[start_time][date] += f",{0}"
 
     # 设置分栏
-    cols = st.columns(2)  # 创建两栏布局
+    cols = st.columns(3)  # 创建三栏布局
 
     # 计数器，用于在不同的列中展示内容
     counter = 0
 
     # 显示卡片内容
-    for time, schedules in table_data.items():
-        with cols[counter % 2]:  # 在两栏中交替显示
-            st.markdown(f"### {time}")
+    for time, schedules in data.items():
+        with cols[counter % 3]:  # 在三栏中交替显示
+            st.markdown(f"#### {time}", unsafe_allow_html=True)  # 小标题显示时间
             for date, locations in schedules.items():
-                st.markdown(f"**{date}**")
-                locations = locations.replace('|', ', ')
-                st.write(locations)
-                st.markdown("---")
+                st.markdown(f"<div style='text-align:left;'><b>{date}</b></div>", unsafe_allow_html=True)
+                locations = locations.replace('|', '<br>')
+                st.markdown(f"<div style='text-align:left;'>{locations}</div>", unsafe_allow_html=True)
+            st.markdown("<hr style='border:1px solid #ccc;'>", unsafe_allow_html=True)  # 添加分割线
         counter += 1
 
     # # 将数据转换为 HTML 表格格式
