@@ -27,11 +27,11 @@ def get_realtime_tennis_court_data():
 
     # Get today's date and current time
     today = datetime.today()
-    today_str = today.strftime("%m-%d")
+    today_str = today.strftime("%Y-%m-%d")
     current_hour = today.strftime('%H:00')
 
     # Prepare the date range for the next 7 days and their weekday names
-    date_range = [(today + timedelta(days=i)).strftime('%m-%d') for i in range(7)]
+    date_range = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
     weekdays = [(today + timedelta(days=i)).strftime('%A') for i in range(7)]
 
     # Prepare the time slots from 07:00 to 22:00 (倒序)
@@ -82,7 +82,7 @@ def get_realtime_tennis_court_data():
         schedules = table_data[time]
         html_table += f"<tr><td style='background-color: #f2f2f2; text-align:left;'>{time}</td>"
         for date in date_range:
-            cell_background_color = "#d3d3d3" if time <= current_hour and today_str in data else "white"
+            cell_background_color = "#d3d3d3" if time <= current_hour and today in data else "white"
             locations = schedules.get(date, "")
             if not locations:
                 locations = "广告位招租"  # 显示“广告位招租”占位符
