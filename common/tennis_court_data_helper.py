@@ -63,7 +63,7 @@ def get_realtime_tennis_court_data():
         <table border="1" style="width:100%; text-align:center;">
           <thead>
             <tr>
-              <th style="background-color: #f2f2f2;">{current_min}</th>
+              <th style="background-color: #f2f2f2;">{current_min}<br>刷新</th>
     """
 
     # 动态获取日期列标题和星期名称
