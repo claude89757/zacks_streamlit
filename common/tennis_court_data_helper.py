@@ -54,15 +54,23 @@ def get_realtime_tennis_court_data():
                             else:
                                 table_data[start_time][date] += f",{court_index}"
 
-    # 显示为卡片
+    # 设置分栏
+    cols = st.columns(2)  # 创建两栏布局
+
+    # 计数器，用于在不同的列中展示内容
+    counter = 0
+
+    # 显示卡片内容
     for time, schedules in table_data.items():
-        st.markdown(f"### {time}")
-        for date, locations in schedules.items():
-            st.markdown(f"**{date}**")
-            locations = locations.replace('|', ', ')
-            st.write(locations)
-            st.markdown("---")
-    
+        with cols[counter % 2]:  # 在两栏中交替显示
+            st.markdown(f"### {time}")
+            for date, locations in schedules.items():
+                st.markdown(f"**{date}**")
+                locations = locations.replace('|', ', ')
+                st.write(locations)
+                st.markdown("---")
+        counter += 1
+
     # 将数据转换为 HTML 表格格式
     html_table = """
     <table border="1" style="width:100%; text-align:center;">
