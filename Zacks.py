@@ -35,5 +35,5 @@ st.title("Zacks")
 st.markdown("This is new Zacks Web!!!!!!")
 
 # Get realtime tennis court data
-data = get_realtime_tennis_court_data()
-st.dataframe(data)
+data_df = get_realtime_tennis_court_data()
+st.dataframe(data_df)
