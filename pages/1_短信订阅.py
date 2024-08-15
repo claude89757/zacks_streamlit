@@ -157,14 +157,18 @@ with tab1:
             st.balloons()
             st.success("订阅创建成功！请关注手机短信提醒。")
 
-
-st.write(f"del_subscription_id: {st.session_state.del_subscription_id}")
-st.write(f"del_subscription_id: {st.query_params.get('del_subscription_id')}")
-
+st.write(st.query_params)
+st.write(st.session_state)
 
 # 查询订阅 TAB
 with tab2:
-
+    if st.session_state.del_subscription_id or st.query_params.get("del_subscription_id") :
+        csv_file_path = f"{st.session_state.phone_number}_subscriptions.csv"
+        delete_subscription(st.query_params.del_subscription_id, )
+        st.success(f"订阅  {st.session_state.del_subscription_id} 已删除")
+        st.session_state.del_subscription_id = ""
+        st.query_params.del_subscription_id = ""
+        st.rerun()
     st.header("查询订阅")
     phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
     st.session_state.phone_number = phone_number
