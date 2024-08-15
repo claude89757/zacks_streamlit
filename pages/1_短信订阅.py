@@ -56,6 +56,12 @@ if not os.path.exists(CSV_FILE_PATH):
     df.to_csv(CSV_FILE_PATH, index=False)
 
 
+# 检查 CSV 文件是否存在，如果不存在则创建
+if not os.path.exists(CSV_FILE_PATH):
+    df = pd.DataFrame(columns=FIELDS)
+    df.to_csv(CSV_FILE_PATH, index=False)
+
+
 # 读取 CSV 文件
 def read_csv():
     return pd.read_csv(CSV_FILE_PATH)
@@ -69,7 +75,8 @@ def write_csv(df):
 # 创建订阅
 def create_subscription(data):
     df = read_csv()
-    df = df.append(data, ignore_index=True)
+    new_row = pd.DataFrame([data])
+    df = pd.concat([df, new_row], ignore_index=True)
     write_csv(df)
 
 
