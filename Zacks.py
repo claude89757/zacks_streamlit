@@ -32,7 +32,7 @@ sidebar()
 # Render Streamlit pages
 st.title("Zacks")
 
-st.markdown("This is new Zacks Web!!!!!!")
+st.markdown("This is new Zacks Web!")
 
 # Get realtime tennis court data
 data_df = get_realtime_tennis_court_data()
