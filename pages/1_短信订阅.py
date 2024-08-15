@@ -3,7 +3,7 @@
 """
 @Time    : 2024/8/11 18:52
 @Author  : claude
-@File    : 1_创建订阅.py
+@File    : 1_短信订阅.py
 @Software: PyCharm
 """
 import time
