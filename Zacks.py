@@ -36,4 +36,5 @@ st.markdown("This is new Zacks Web!!!!!!")
 
 # Get realtime tennis court data
 data_df = get_realtime_tennis_court_data()
+st.write(data_df)
 st.dataframe(data_df)
