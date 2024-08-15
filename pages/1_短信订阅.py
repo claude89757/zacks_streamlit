@@ -96,21 +96,26 @@ with tab1:
     subscription_data["订阅场地"] = st.selectbox("订阅场地", VENUE_OPTIONS)
     subscription_data["最短时长"] = st.selectbox("最短时长", DURATION_OPTIONS)
     subscription_data["开始日期"] = st.date_input("开始日期")
-    subscription_data["结束日期"] = st.date_input("结束日期")
+    subscription_data["结束日期"] = st.date_input("结束日期", value=pd.to_datetime("tomorrow").date())
     subscription_data["开始时间"] = st.time_input("开始时间", value=pd.to_datetime("18:00").time())
-    subscription_data["结束时间"] = st.time_input("结束时间")
+    subscription_data["结束时间"] = st.time_input("结束时间", value=pd.to_datetime("22:00").time())
     subscription_data["手机号"] = st.text_input("手机号")
     subscription_data["昵称"] = st.text_input("昵称（可选）")
     subscription_data["订阅状态"] = "运行中"
     subscription_data["今天短信"] = "-"
     subscription_data["累计短信"] = "-"
     subscription_data["手机尾号"] = subscription_data["手机号"][-4:]
-    subscription_data["用户等级"] = "普通"
+    subscription_data["用户等级"] = "VIP"
     subscription_data["创建时间"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
     if st.button("提交"):
-        create_subscription(subscription_data)
-        st.success("订阅创建成功！")
+        # 手机号验证
+        if not subscription_data["手机号"].isdigit() or len(subscription_data["手机号"]) != 11:
+            st.error("请输入有效的11位手机号")
+        else:
+            create_subscription(subscription_data)
+            st.balloons()
+            st.success("订阅创建成功！请关注手机短信提醒。")
 
 # 查询订阅 TAB
 with tab2:
@@ -118,7 +123,24 @@ with tab2:
     phone_suffix = st.text_input("输入手机尾号")
     if st.button("查询"):
         results = query_subscription(phone_suffix)
-        st.write(results)
+        if results.empty:
+            st.warning("未找到相关订阅信息，请检查手机尾号是否正确。")
+        else:
+            for index, row in results.iterrows():
+                with st.expander(f"订阅 {index + 1}"):
+                    st.write(f"**订阅场地**: {row['订阅场地']}")
+                    st.write(f"**开始日期**: {row['开始日期']}")
+                    st.write(f"**结束日期**: {row['结束日期']}")
+                    st.write(f"**开始时间**: {row['开始时间']}")
+                    st.write(f"**结束时间**: {row['结束时间']}")
+                    st.write(f"**最短时长**: {row['最短时长']}")
+                    st.write(f"**订阅状态**: {row['订阅状态']}")
+                    st.write(f"**今天短信**: {row['今天短信']}")
+                    st.write(f"**累计短信**: {row['累计短信']}")
+                    st.write(f"**手机尾号**: {row['手机尾号']}")
+                    st.write(f"**用户等级**: {row['用户等级']}")
+                    st.write(f"**创建时间**: {row['创建时间']}")
+                    st.write(f"**昵称**: {row['昵称']}")
 
 # 删除订阅 TAB
 with tab3:
