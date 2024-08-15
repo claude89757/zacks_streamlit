@@ -34,9 +34,14 @@ st.title("空场短信提醒")
 # CSV 文件路径
 CSV_FILE_PATH = "subscriptions.csv"
 
-# init
+# 初始化 session state
 if 'phone_number' not in st.session_state:
-    st.session_state.phone_number = ""
+    st.session_state.phone_number = ''
+if 'results' not in st.session_state:
+    st.session_state.results = pd.DataFrame()
+if 'selected_subscriptions' not in st.session_state:
+    st.session_state.selected_subscriptions = []
+
 
 # 订阅的字段
 FIELDS = [
@@ -138,7 +143,7 @@ with tab1:
     subscription_data["创建时间"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
     # 提交按钮
-    if st.button("提交", key="submit_button", help="点击提交订阅信息"):
+    if st.button("创建订阅", key="submit_button", help="点击提交订阅信息"):
         # 手机号验证
         if not subscription_data["手机号"].isdigit() or len(subscription_data["手机号"]) != 11:
             st.error("请输入有效的11位手机号")
@@ -151,7 +156,7 @@ with tab1:
 with tab2:
     st.header("查询订阅")
     phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
-    if st.button("查询"):
+    if st.button("查询订阅"):
         results = query_subscription(phone_number)
         if results.empty:
             st.warning("未找到相关订阅信息，请检查手机号是否正确。")
@@ -173,24 +178,30 @@ with tab2:
                     st.write(f"**昵称**: {row['昵称']}")
 
 # 删除订阅 TAB
+# 删除订阅 TAB
 with tab3:
     st.header("删除订阅")
     phone_number = st.text_input("输入手机号", value=st.session_state.phone_number)
     if st.button("查询订阅"):
-        results = query_subscription(phone_number)
-        if not results.empty:
-            def format_subscription(index):
-                row = results.loc[index]
-                return f"{row['订阅场地']} - {row['开始日期']}至{row['结束日期']} - {row['开始时间']}至{row['结束时间']}"
+        st.session_state.results = query_subscription(phone_number)
+        st.session_state.phone_number = phone_number
 
+    results = st.session_state.results
+    if not results.empty:
+        def format_subscription(index):
+            row = results.loc[index]
+            return f"{row['订阅场地']} - {row['开始日期']}至{row['结束日期']} - {row['开始时间']}至{row['结束时间']}"
 
-            selected_subscriptions = st.multiselect(
-                "选择要删除的订阅",
-                results.index,
-                format_func=format_subscription
-            )
-            if st.button("删除"):
-                delete_subscription(results.loc[selected_subscriptions, "手机号"].tolist())
-                st.success("订阅删除成功！")
-        else:
-            st.warning("未找到匹配的订阅。")
+        st.session_state.selected_subscriptions = st.multiselect(
+            "选择要删除的订阅",
+            results.index,
+            format_func=format_subscription
+        )
+
+        if st.button("删除订阅", type='primary'):
+            delete_subscription(results.loc[st.session_state.selected_subscriptions, "手机号"].tolist())
+            st.success("订阅删除成功！")
+            st.session_state.results = pd.DataFrame()  # 清空查询结果
+            st.session_state.selected_subscriptions = []  # 清空选中的订阅
+    else:
+        st.warning("未找到匹配的订阅。")
