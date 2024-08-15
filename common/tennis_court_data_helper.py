@@ -25,8 +25,9 @@ def get_realtime_tennis_court_data():
     response = requests.get(api_url, timeout=10)
     data = response.json()
 
-    # Get today's date
+    # Get today's date and current time
     today = datetime.today()
+    current_hour = today.strftime('%H:00')
 
     # Prepare the date range for the next 7 days
     date_range = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
@@ -75,12 +76,14 @@ def get_realtime_tennis_court_data():
 
     # 添加每个时间段的数据
     for time in time_slots:
+        # 判断是否为过去或当前小时
+        background_color = "#d3d3d3" if time <= current_hour else "white"
         schedules = table_data[time]
-        html_table += f"<tr><td style='background-color: #f2f2f2; text-align:left;'>{time}</td>"
+        html_table += f"<tr><td style='background-color: {background_color}; text-align:left;'>{time}</td>"
         for date in dates:
             locations = schedules.get(date, "")
             if not locations:
-                locations = ""  # 显示“广告位招租”占位符
+                locations = "广告位招租"  # 显示“广告位招租”占位符
             # 使用 <br> 实现自动换行并将内容左对齐
             locations = locations.replace('|', '<br>')
             html_table += f"<td style='width:auto; text-align:left;'>{locations}</td>"
