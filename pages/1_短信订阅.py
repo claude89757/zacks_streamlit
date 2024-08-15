@@ -158,7 +158,7 @@ with tab1:
     subscription_data["创建时间"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
     # 提交按钮
-    if st.button("创建订阅", key="submit_button", help="点击提交订阅信息"):
+    if st.button("创建订阅", key="submit_button", help="点击提交订阅信息", type="primary"):
         # 手机号验证
         if not subscription_data["手机号"].isdigit() or len(subscription_data["手机号"]) != 11:
             st.error("请输入有效的11位手机号")
@@ -195,7 +195,7 @@ with tab2:
                     st.write(f"**昵称**: {row['昵称']}")
 
                     # 删除按钮
-                    if st.button(f"删除订阅 {index + 1}", key=f"delete_button_{index}"):
+                    if st.button(f"删除订阅 {index + 1}", key=f"delete_button_{index}", type="primary"):
                         delete_subscription(phone_number, row.name)
                         st.session_state.query_triggered = True
                         st.success(f"订阅 {index + 1} 已删除")
