@@ -108,7 +108,7 @@ def delete_subscription(subscription_id, csv_file_path):
 
 
 # 页面布局
-tab1, tab2 = st.tabs(["创建订阅", "查询订阅"])
+tab1, tab2, tab3 = st.tabs(["创建订阅", "查询订阅", "删除订阅"])
 
 # 创建订阅 TAB
 with tab1:
@@ -166,30 +166,25 @@ st.write(st.session_state)
 
 # 查询订阅 TAB
 with tab2:
-    if (st.session_state.del_subscription_id or st.query_params.get("del_subscription_id")) and st.session_state.phone_number:
-        csv_file_path = f"{st.session_state.phone_number}_subscriptions.csv"
-        delete_subscription(st.query_params.del_subscription_id, csv_file_path)
-        st.success(f"订阅  {st.session_state.del_subscription_id} 已删除")
-        st.session_state.del_subscription_id = ""
-        st.query_params.del_subscription_id = ""
-        st.rerun()
-
     st.header("查询订阅")
     phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
     st.session_state.phone_number = phone_number
-    if not phone_number or len(phone_number) != 11:
-        st.error("请输入有效的11位手机号")
-        time.sleep(1)
-        st.rerun()
-    else:
-        if st.button("查询订阅", key="query_button_01"):
-            csv_file_path = f"{phone_number}_subscriptions.csv"
-            results = query_subscription(phone_number, csv_file_path)
-            if results.empty:
-                st.warning("未找到相关订阅信息，请检查手机号是否正确。")
-            else:
-                for index, row in results.iterrows():
-                    st.write(f"订阅 {index + 1}: {row['订阅场地']} {row['订阅状态']}")
+
+    if st.button("查询订阅", key="query_button_01"):
+        if not phone_number or len(phone_number) != 11:
+            st.error("请输入有效的11位手机号")
+            time.sleep(2)
+            st.rerun()
+        else:
+            pass
+
+        csv_file_path = f"{phone_number}_subscriptions.csv"
+        results = query_subscription(phone_number, csv_file_path)
+        if results.empty:
+            st.warning("未找到相关订阅信息，请检查手机号是否正确。")
+        else:
+            for index, row in results.iterrows():
+                with st.expander(f"订阅 {index + 1}: {row['订阅场地']} {row['订阅状态']}"):
                     st.write(f"**开始日期**: {row['开始日期']}")
                     st.write(f"**结束日期**: {row['结束日期']}")
                     st.write(f"**开始时间**: {row['开始时间']}")
@@ -201,13 +196,38 @@ with tab2:
                     st.write(f"**用户等级**: {row['用户等级']}")
                     st.write(f"**创建时间**: {row['创建时间']}")
                     st.write(f"**昵称**: {row['昵称']}")
-                    st.write("---")
 
-                    # 删除按钮
-                    st.write(f"订阅ID")
-                    if st.button(f"删除订阅", key=f"del_button_{index}", type="primary"):
-                        st.warning("????????????")
-                        # st.query_params.del_subscription_id = row['订阅ID']
-                        # st.session_state.del_subscription_id = row['订阅ID']
-                        time.sleep(3)
-                        st.rerun()
+# 删除订阅 TAB
+with tab3:
+    st.header("删除订阅")
+    phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
+    st.session_state.phone_number = phone_number
+
+    if st.button("查询订阅", key="query_button_02"):
+        if not phone_number or len(phone_number) != 11:
+            st.error("请输入有效的11位手机号")
+            time.sleep(2)
+            st.rerun()
+        else:
+            pass
+
+        # CSV 文件路径
+        csv_file_path = f"{phone_number}_subscriptions.csv"
+        results = query_subscription(phone_number, csv_file_path)
+        if results.empty:
+            st.warning("未找到相关订阅信息，请检查手机号是否正确。")
+        else:
+            # 显示订阅信息以供选择
+            display_options = results.apply(
+                lambda row: f"场地: {row['订阅场地']} | 状态: {row['订阅状态']} | 开始日期: {row['开始日期']}",
+                axis=1
+            ).tolist()
+
+            selected_index = st.selectbox("选择要删除的订阅", range(len(display_options)),
+                                          format_func=lambda x: display_options[x])
+
+            if st.button("删除订阅", key="delete_button"):
+                selected_subscription_id = results.iloc[selected_index]["订阅ID"]
+                delete_subscription(selected_subscription_id, csv_file_path)
+                st.success("订阅删除成功！")
+                st.rerun()  # 刷新页面以更新订阅列表
