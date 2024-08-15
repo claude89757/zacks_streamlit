@@ -9,13 +9,12 @@
 import time
 import os
 import pandas as pd
-
+from filelock import FileLock
 import streamlit as st
 from common.log_config import setup_logger
 from common.settings import common_settings_init
 from sidebar import sidebar
 import uuid
-
 
 # Configure logger
 logger = setup_logger(__name__)
@@ -32,7 +31,6 @@ sidebar()
 # Render Streamlit pages
 st.title("空场短信提醒")
 
-
 # 初始化 session state
 if 'phone_number' not in st.session_state:
     st.session_state.phone_number = ''
@@ -42,7 +40,6 @@ if 'selected_subscriptions' not in st.session_state:
     st.session_state.selected_subscriptions = []
 if 'del_subscription_id' not in st.session_state:
     st.session_state.del_subscription_id = st.query_params.get('del_subscription_id', "")
-
 
 # 订阅的字段
 FIELDS = [
@@ -60,23 +57,25 @@ VENUE_OPTIONS = [
 # 最短时长选项
 DURATION_OPTIONS = ['1小时', '2小时', '3小时']
 
-
 CSV_FILE_PATH = "subscriptions.csv"
+LOCK_FILE_PATH = "subscriptions.lock"
 
+# 文件锁
+lock = FileLock(LOCK_FILE_PATH)
 
 # 读取 CSV 文件
 def read_csv(CSV_FILE_PATH):
-    # 检查 CSV 文件是否存在，如果不存在则创建
-    if not os.path.exists(CSV_FILE_PATH):
-        df = pd.DataFrame(columns=FIELDS)
-        df.to_csv(CSV_FILE_PATH, index=False)
-    return pd.read_csv(CSV_FILE_PATH)
-
+    with lock:
+        # 检查 CSV 文件是否存在，如果不存在则创建
+        if not os.path.exists(CSV_FILE_PATH):
+            df = pd.DataFrame(columns=FIELDS)
+            df.to_csv(CSV_FILE_PATH, index=False)
+        return pd.read_csv(CSV_FILE_PATH)
 
 # 写入 CSV 文件
 def write_csv(df):
-    df.to_csv(CSV_FILE_PATH, index=False)
-
+    with lock:
+        df.to_csv(CSV_FILE_PATH, index=False)
 
 # 创建订阅
 def create_subscription(data, CSV_FILE_PATH):
@@ -86,8 +85,7 @@ def create_subscription(data, CSV_FILE_PATH):
         new_row = pd.DataFrame([data])
         df = pd.concat([df, new_row], ignore_index=True)
         write_csv(df)
-        time.sleep(3)
-
+        time.sleep(1)
 
 # 查询订阅
 def query_subscription(phone_number, CSV_FILE_PATH):
@@ -95,9 +93,8 @@ def query_subscription(phone_number, CSV_FILE_PATH):
         df = read_csv(CSV_FILE_PATH)
         df["手机号"] = df["手机号"].astype(str)  # 确保手机号列为字符串类型
         results = df[df["手机号"].str.contains(phone_number)]
-        time.sleep(3)
+        time.sleep(1)
         return results
-
 
 # 删除订阅
 def delete_subscription(subscription_id, CSV_FILE_PATH):
@@ -107,8 +104,7 @@ def delete_subscription(subscription_id, CSV_FILE_PATH):
         df = df[df["订阅ID"] != subscription_id]
         st.write(df.head(100))
         write_csv(df)
-        time.sleep(3)
-
+        time.sleep(1)
 
 # 页面布局
 tab1, tab2, tab3 = st.tabs(["创建订阅", "查询订阅", "删除订阅"])
@@ -160,11 +156,6 @@ with tab1:
             value = st.session_state.phone_number = subscription_data["手机号"]
             st.balloons()
             st.success("订阅创建成功！请关注手机短信提醒。")
-
-# st.write("query_params")
-# st.write(st.query_params)
-# st.write("session_state")
-# st.write(st.session_state)
 
 # 查询订阅 TAB
 with tab2:
