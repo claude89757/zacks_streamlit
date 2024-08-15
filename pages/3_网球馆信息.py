@@ -11,7 +11,7 @@ from sidebar import sidebar
 logger = setup_logger(__name__)
 
 # Configure Streamlit pages and state
-st.set_page_config(page_title="预定方式", page_icon="🎾", layout="wide")
+st.set_page_config(page_title="网球馆", page_icon="🎾", layout="wide")
 
 # Init settings for ui
 common_settings_init()
@@ -20,7 +20,7 @@ common_settings_init()
 sidebar()
 
 # Define the directory to store the tennis court info and photos
-info_dir = "tennis_court_infos"
+info_dir = "practice_tennis_court_infos"
 photos_dir = os.path.join(info_dir, "photos")
 if not os.path.exists(info_dir):
     os.makedirs(info_dir)
@@ -58,10 +58,10 @@ def get_court_info(name):
     return None
 
 # Render Streamlit pages
-st.title("网球场信息管理系统")
+st.title("网球馆信息管理系统")
 
 # Create tabs
-tab1, tab2 = st.tabs(["录入网球场信息", "展示网球场信息"])
+tab1, tab2 = st.tabs(["网球馆信息", "录入信息"])
 
 # Tab 1: 录入网球场信息
 with tab2:
