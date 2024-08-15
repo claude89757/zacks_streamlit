@@ -29,4 +29,4 @@ sidebar()
 # Render Streamlit pages
 st.title("创建订阅")
 
-st.markdown("创建空场短信提醒的订阅")
+st.markdown("Coming soon ...")
