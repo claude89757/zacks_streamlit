@@ -36,4 +36,4 @@ st.markdown("This is new Zacks Web!!!!!!")
 
 # Get realtime tennis court data
 data = get_realtime_tennis_court_data()
-st.dataframe(data)
+st.tabs(data)
