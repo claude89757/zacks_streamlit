@@ -18,7 +18,7 @@ from sidebar import sidebar
 logger = setup_logger(__name__)
 
 # Configure Streamlit pages and state
-st.set_page_config(page_title="创建订阅", page_icon="🎾", layout="wide")
+st.set_page_config(page_title="短信订阅", page_icon="🎾", layout="wide")
 
 # Init settings for ui
 common_settings_init()
