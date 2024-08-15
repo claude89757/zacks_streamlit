@@ -187,6 +187,8 @@ with tab2:
     st.session_state.phone_number = phone_number
     if not subscription_data["手机号"].isdigit() or len(subscription_data["手机号"]) != 11:
         st.error("请输入有效的11位手机号")
+        time.sleep(1)
+        st.rerun()
     else:
         if st.button("查询订阅", key="query_button_01"):
             results = query_subscription(phone_number)
