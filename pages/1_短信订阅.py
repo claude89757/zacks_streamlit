@@ -205,7 +205,7 @@ with tab2:
 
                     # 删除按钮
                     st.write(f"订阅ID")
-                    if st.button(f"删除订阅", type="primary"):
+                    if st.button(f"删除订阅", key=f"del_button_{index}", type="primary"):
                         st.warning("????????????")
                         # st.query_params.del_subscription_id = row['订阅ID']
                         # st.session_state.del_subscription_id = row['订阅ID']
