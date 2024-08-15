@@ -61,24 +61,27 @@ VENUE_OPTIONS = [
 DURATION_OPTIONS = ['1小时', '2小时', '3小时']
 
 
+CSV_FILE_PATH = "subscriptions.csv"
+
+
 # 读取 CSV 文件
-def read_csv(csv_file_path):
+def read_csv(CSV_FILE_PATH):
     # 检查 CSV 文件是否存在，如果不存在则创建
-    if not os.path.exists(csv_file_path):
+    if not os.path.exists(CSV_FILE_PATH):
         df = pd.DataFrame(columns=FIELDS)
-        df.to_csv(csv_file_path, index=False)
-    return pd.read_csv(csv_file_path)
+        df.to_csv(CSV_FILE_PATH, index=False)
+    return pd.read_csv(CSV_FILE_PATH)
 
 
 # 写入 CSV 文件
 def write_csv(df):
-    df.to_csv(csv_file_path, index=False)
+    df.to_csv(CSV_FILE_PATH, index=False)
 
 
 # 创建订阅
-def create_subscription(data, csv_file_path):
+def create_subscription(data, CSV_FILE_PATH):
     with st.spinner("creating subscription..."):
-        df = read_csv(csv_file_path)
+        df = read_csv(CSV_FILE_PATH)
         data["订阅ID"] = str(uuid.uuid4())  # 生成唯一的订阅ID
         new_row = pd.DataFrame([data])
         df = pd.concat([df, new_row], ignore_index=True)
@@ -87,9 +90,9 @@ def create_subscription(data, csv_file_path):
 
 
 # 查询订阅
-def query_subscription(phone_number, csv_file_path):
+def query_subscription(phone_number, CSV_FILE_PATH):
     with st.spinner("querying subscription..."):
-        df = read_csv(csv_file_path)
+        df = read_csv(CSV_FILE_PATH)
         df["手机号"] = df["手机号"].astype(str)  # 确保手机号列为字符串类型
         results = df[df["手机号"].str.contains(phone_number)]
         time.sleep(3)
@@ -97,9 +100,9 @@ def query_subscription(phone_number, csv_file_path):
 
 
 # 删除订阅
-def delete_subscription(subscription_id, csv_file_path):
+def delete_subscription(subscription_id, CSV_FILE_PATH):
     with st.spinner("deleting subscription..."):
-        df = read_csv(csv_file_path)
+        df = read_csv(CSV_FILE_PATH)
         st.write(df.head(100))
         df = df[df["订阅ID"] != subscription_id]
         st.write(df.head(100))
@@ -153,16 +156,15 @@ with tab1:
             st.error("请输入有效的11位手机号")
         else:
             # CSV 文件路径
-            csv_file_path = f"{subscription_data['手机号']}_subscriptions.csv"
-            create_subscription(subscription_data, csv_file_path)
+            create_subscription(subscription_data, CSV_FILE_PATH)
             value = st.session_state.phone_number = subscription_data["手机号"]
             st.balloons()
             st.success("订阅创建成功！请关注手机短信提醒。")
 
-st.write("query_params")
-st.write(st.query_params)
-st.write("session_state")
-st.write(st.session_state)
+# st.write("query_params")
+# st.write(st.query_params)
+# st.write("session_state")
+# st.write(st.session_state)
 
 # 查询订阅 TAB
 with tab2:
@@ -178,8 +180,7 @@ with tab2:
         else:
             pass
 
-    csv_file_path = f"{phone_number}_subscriptions.csv"
-    results = query_subscription(phone_number, csv_file_path)
+    results = query_subscription(phone_number, CSV_FILE_PATH)
     if results.empty:
         st.warning("未找到相关订阅信息，请检查手机号是否正确。")
     else:
@@ -206,51 +207,7 @@ with tab2:
                 # Only delete if button is clicked
                 if st.button("删除订阅", key="delete_button"):
                     if st.session_state.selected_subscription_id:
-                        delete_subscription(st.session_state.selected_subscription_id, csv_file_path)
+                        delete_subscription(st.session_state.selected_subscription_id, CSV_FILE_PATH)
                         st.session_state.selected_subscription_id = None  # Clear the selection
                         st.success("订阅删除成功！")
                         st.rerun()  # Refresh page to update subscription list
-
-# 删除订阅 TAB
-with tab3:
-    st.header("删除订阅")
-    phone_number = st.text_input("输入手机", key="input_phone_02", value=st.session_state.phone_number)
-    st.session_state.phone_number = phone_number
-
-    if st.button("查询订阅", key="query_button_02"):
-        if not phone_number or len(phone_number) != 11:
-            st.error("请输入有效的11位手机号")
-            time.sleep(2)
-            st.rerun()
-        else:
-            pass
-
-    if st.session_state.phone_number:
-        # CSV 文件路径
-        csv_file_path = f"{phone_number}_subscriptions.csv"
-        results = query_subscription(phone_number, csv_file_path)
-        if results.empty:
-            st.warning("未找到相关订阅信息，请检查手机号是否正确。")
-        else:
-            # 显示订阅信息以供选择
-            display_options = results.apply(
-                lambda row: f"场地: {row['订阅场地']} | 状态: {row['订阅状态']} | 开始日期: {row['开始日期']}",
-                axis=1
-            ).tolist()
-
-            selected_index = st.selectbox("选择要删除的订阅", range(len(display_options)),
-                                          format_func=lambda x: display_options[x])
-
-            # Store the selected subscription ID in session state
-            if 'selected_subscription_id' not in st.session_state:
-                st.session_state.selected_subscription_id = None
-
-            st.session_state.selected_subscription_id = results.iloc[selected_index]["订阅ID"]
-
-            # Only delete if button is clicked
-            if st.button("删除订阅", key="delete_button"):
-                if st.session_state.selected_subscription_id:
-                    delete_subscription(st.session_state.selected_subscription_id, csv_file_path)
-                    st.session_state.selected_subscription_id = None  # Clear the selection
-                    st.success("订阅删除成功！")
-                    st.rerun()  # Refresh page to update subscription list
