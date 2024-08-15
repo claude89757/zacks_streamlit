@@ -63,7 +63,7 @@ def set_realtime_tennis_court_sheet():
         <table border="1" style="width:100%; text-align:center; table-layout: auto;">
           <thead>
             <tr>
-              <th style="background-color: white; white-space: nowrap;">{current_min}<br>Refresh</th>
+              <th style="background-color: white; white-space: nowrap;">{current_min}<br>🎾</th>
     """
 
     # 动态获取日期列标题和星期名称
