@@ -83,6 +83,7 @@ def create_subscription(data, csv_file_path):
         new_row = pd.DataFrame([data])
         df = pd.concat([df, new_row], ignore_index=True)
         write_csv(df)
+        time.sleep(3)
 
 
 # 查询订阅
@@ -163,12 +164,7 @@ st.write(f"del_subscription_id: {st.query_params.get('del_subscription_id')}")
 
 # 查询订阅 TAB
 with tab2:
-    if st.session_state.del_subscription_id or st.query_params.get("del_subscription_id"):
-        delete_subscription(st.query_params.del_subscription_id)
-        st.success(f"订阅  {st.session_state.del_subscription_id} 已删除")
-        st.session_state.del_subscription_id = ""
-        st.query_params.del_subscription_id = ""
-        st.rerun()
+
     st.header("查询订阅")
     phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
     st.session_state.phone_number = phone_number
