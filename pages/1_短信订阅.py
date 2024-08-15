@@ -153,7 +153,7 @@ with tab2:
             st.warning("未找到相关订阅信息，请检查手机号是否正确。")
         else:
             for index, row in results.iterrows():
-                with st.expander(f"订阅 {index + 1}"):
+                with st.expander(f"订阅 {index + 1}: {row['订阅场地']} {row['订阅状态']}"):
                     st.write(f"**订阅场地**: {row['订阅场地']}")
                     st.write(f"**开始日期**: {row['开始日期']}")
                     st.write(f"**结束日期**: {row['结束日期']}")
@@ -174,7 +174,19 @@ with tab3:
     phone_number = st.text_input("输入手机号")
     if st.button("查询订阅"):
         results = query_subscription(phone_number[-4:])
-        selected_subscription = st.selectbox("选择要删除的订阅", results.index)
-        if st.button("删除"):
-            delete_subscription(results.loc[selected_subscription, "手机号"])
-            st.success("订阅删除成功！")
+        if not results.empty:
+            def format_subscription(index):
+                row = results.loc[index]
+                return f"{row['订阅场地']} - {row['开始日期']}至{row['结束日期']} - {row['开始时间']}至{row['结束时间']}"
+
+
+            selected_subscriptions = st.multiselect(
+                "选择要删除的订阅",
+                results.index,
+                format_func=format_subscription
+            )
+            if st.button("删除"):
+                delete_subscription(results.loc[selected_subscriptions, "手机号"].tolist())
+                st.success("订阅删除成功！")
+        else:
+            st.warning("未找到匹配的订阅。")
