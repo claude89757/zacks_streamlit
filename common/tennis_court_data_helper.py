@@ -54,63 +54,44 @@ def get_realtime_tennis_court_data():
                             else:
                                 table_data[start_time][date] += f",{0}"
 
-    # # 设置分栏
-    # cols = st.columns(3)  # 创建三栏布局
-    #
-    # # 计数器，用于在不同的列中展示内容
-    # counter = 0
-    #
-    # # 显示卡片内容
-    # for time, schedules in table_data.items():
-    #     with cols[counter % 3]:  # 在三栏中交替显示
-    #         st.markdown(f"#### {time}", unsafe_allow_html=True)  # 小标题显示时间
-    #         for date, locations in schedules.items():
-    #             st.markdown(f"<div style='text-align:left;'><b>{date}</b></div>", unsafe_allow_html=True)
-    #             locations = locations.replace('|', '<br>')
-    #             st.markdown(f"<div style='text-align:left;'>{locations}</div>", unsafe_allow_html=True)
-    #         st.markdown("<hr style='border:1px solid #ccc;'>", unsafe_allow_html=True)  # 添加分割线
-    #     counter += 1
+    # 将数据转换为 HTML 表格格式
+    html_table = """
+    <table border="1" style="width:100%; text-align:center;">
+      <thead>
+        <tr>
+          <th>时间</th>
+    """
 
-    # # 将数据转换为 HTML 表格格式
-    # html_table = """
-    # <table border="1" style="width:100%; text-align:center;">
-    #   <thead>
-    #     <tr>
-    #       <th>时间</th>
-    # """
-    #
-    # # 动态获取日期列标题
-    # dates = list(next(iter(table_data.values())).keys())
-    # for date in dates:
-    #     html_table += f"<th style='width:auto;'>{date}</th>"
-    #
-    # html_table += """
-    #     </tr>
-    #   </thead>
-    #   <tbody>
-    # """
-    #
-    # # 添加每个时间段的数据
-    # for time, schedules in table_data.items():
-    #     html_table += f"<tr><td style='text-align:left;'>{time}</td>"
-    #     for date in dates:
-    #         locations = schedules.get(date, "")
-    #         if not locations:
-    #             locations = "广告位招租"  # 显示“广告位招租”占位符
-    #         # 使用 <br> 实现自动换行并将内容左对齐
-    #         locations = locations.replace('|', '<br>')
-    #         html_table += f"<td style='width:auto; text-align:left;'>{locations}</td>"
-    #     html_table += "</tr>"
-    #
-    # html_table += """
-    #   </tbody>
-    # </table>
-    # """
-    #
-    # # 使用 Streamlit 显示表格
-    # st.markdown(html_table, unsafe_allow_html=True)
+    # 动态获取日期列标题
+    dates = list(next(iter(table_data.values())).keys())
+    for date in dates:
+        html_table += f"<th style='width:auto;'>{date}</th>"
 
+    html_table += """
+        </tr>
+      </thead>
+      <tbody>
+    """
 
+    # 添加每个时间段的数据
+    for time, schedules in table_data.items():
+        html_table += f"<tr><td style='text-align:left;'>{time}</td>"
+        for date in dates:
+            locations = schedules.get(date, "")
+            if not locations:
+                locations = "广告位招租"  # 显示“广告位招租”占位符
+            # 使用 <br> 实现自动换行并将内容左对齐
+            locations = locations.replace('|', '<br>')
+            html_table += f"<td style='width:auto; text-align:left;'>{locations}</td>"
+        html_table += "</tr>"
+
+    html_table += """
+      </tbody>
+    </table>
+    """
+
+    # 使用 Streamlit 显示表格
+    st.markdown(html_table, unsafe_allow_html=True)
 
     # # Remove trailing commas and deduplicate court names
     # for time_slot in table_data:
