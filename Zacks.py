@@ -14,7 +14,7 @@ from sidebar import sidebar
 
 from common.log_config import setup_logger
 from common.settings import common_settings_init
-from common.tennis_court_data_helper import get_realtime_tennis_court_data
+from common.tennis_court_data_helper import set_realtime_tennis_court_sheet
 
 
 # Configure logger
@@ -27,10 +27,10 @@ st.set_page_config(page_title="Zacks", page_icon="🎾", layout="wide")
 common_settings_init()
 
 # Init sidebar
-# sidebar()
+sidebar()
 
 # Render Streamlit pages
 st.title("深圳热门网球场实时动态")
 
 # Get realtime tennis court data
-data_df = get_realtime_tennis_court_data()
+set_realtime_tennis_court_sheet()

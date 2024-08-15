@@ -10,11 +10,10 @@
 import requests
 import json
 from datetime import datetime, timedelta
-import pandas as pd
 import streamlit as st
 
 
-def get_realtime_tennis_court_data():
+def set_realtime_tennis_court_sheet():
     """
     查询场地数据
     :return:
@@ -54,9 +53,10 @@ def get_realtime_tennis_court_data():
                         start_time, end_time = slot
                         if start_time in table_data and date in table_data[start_time]:
                             if court_name not in table_data[start_time][date]:
-                                table_data[start_time][date] += f"\n{court_name}:{0}"
+                                table_data[start_time][date] += f"|{court_name}:{0}"
                             else:
                                 table_data[start_time][date] += f",{0}"
+                            table_data[start_time][date] = table_data[start_time][date].strip("|")
 
     # 将数据转换为 HTML 表格格式
     html_table = F"""
