@@ -60,13 +60,14 @@ def get_realtime_tennis_court_data():
       <thead>
         <tr>
           <th>时间</th>
-          <th>2024-08-15</th>
-          <th>2024-08-16</th>
-          <th>2024-08-17</th>
-          <th>2024-08-18</th>
-          <th>2024-08-19</th>
-          <th>2024-08-20</th>
-          <th>2024-08-21</th>
+    """
+
+    # 动态获取日期列标题
+    dates = list(next(iter(table_data.values())).keys())
+    for date in dates:
+        html_table += f"<th style='width:auto;'>{date}</th>"
+
+    html_table += """
         </tr>
       </thead>
       <tbody>
@@ -75,13 +76,13 @@ def get_realtime_tennis_court_data():
     # 添加每个时间段的数据
     for time, schedules in table_data.items():
         html_table += f"<tr><td>{time}</td>"
-        for date in ["2024-08-15", "2024-08-16", "2024-08-17", "2024-08-18", "2024-08-19", "2024-08-20", "2024-08-21"]:
+        for date in dates:
             locations = schedules.get(date, "")
             if not locations:
                 locations = "广告位招租"  # 显示“广告位招租”占位符
             # 使用 <br> 实现自动换行
             locations = locations.replace('|', '<br>')
-            html_table += f"<td>{locations}</td>"
+            html_table += f"<td style='width:auto;'>{locations}</td>"
         html_table += "</tr>"
 
     html_table += """
