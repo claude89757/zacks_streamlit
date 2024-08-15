@@ -34,6 +34,10 @@ st.title("空场短信提醒")
 # CSV 文件路径
 CSV_FILE_PATH = "subscriptions.csv"
 
+# init
+if 'phone_number' not in st.session_state:
+    st.session_state.phone_number = ""
+
 # 订阅的字段
 FIELDS = [
     "订阅场地", "开始日期", "结束日期", "开始时间", "结束时间", "最短时长", "订阅状态",
@@ -122,7 +126,7 @@ with tab1:
 
     col7, col8 = st.columns(2)
     with col7:
-        subscription_data["手机号"] = st.text_input("手机号")
+        subscription_data["手机号"] = st.text_input("手机号", value=st.session_state.phone_number)
     with col8:
         subscription_data["昵称"] = st.text_input("昵称（可选）")
 
@@ -146,7 +150,7 @@ with tab1:
 # 查询订阅 TAB
 with tab2:
     st.header("查询订阅")
-    phone_number = st.text_input("输入手机")
+    phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
     if st.button("查询"):
         results = query_subscription(phone_number)
         if results.empty:
@@ -171,9 +175,9 @@ with tab2:
 # 删除订阅 TAB
 with tab3:
     st.header("删除订阅")
-    phone_number = st.text_input("输入手机号")
+    phone_number = st.text_input("输入手机号", value=st.session_state.phone_number)
     if st.button("查询订阅"):
-        results = query_subscription(phone_number[-4:])
+        results = query_subscription(phone_number)
         if not results.empty:
             def format_subscription(index):
                 row = results.loc[index]
