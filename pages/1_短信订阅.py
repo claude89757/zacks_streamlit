@@ -175,11 +175,14 @@ with tab1:
             st.success("订阅创建成功！请关注手机短信提醒。")
 
 st.write(f"del_subscription_id: {st.session_state.del_subscription_id}")
+st.write(f"del_subscription_id: {st.query_params.del_subscription_id}")
+
 
 # 查询订阅 TAB
 with tab2:
-    if st.session_state.del_subscription_id:
-        delete_subscription(st.session_state.del_subscription_id)
+    if st.session_state.del_subscription_id or st.query_params.del_subscription_id:
+
+        delete_subscription(st.query_params.del_subscription_id)
         st.success(f"订阅  {st.session_state.del_subscription_id} 已删除")
         st.session_state.del_subscription_id = ""
         st.query_params.del_subscription_id = ""
@@ -215,7 +218,7 @@ with tab2:
                         # 删除按钮
                         st.write(f"订阅ID: {row['订阅ID']}")
                         st.query_params.del_subscription_id = row['订阅ID']
-                        
+
                         if st.button(f"删除订阅 {index + 1}", type="primary"):
                             st.warning("????????????")
                             st.query_params.del_subscription_id = row['订阅ID']
