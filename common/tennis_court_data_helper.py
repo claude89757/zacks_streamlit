@@ -21,6 +21,14 @@ def get_realtime_tennis_court_data():
     """
     api_url = f"http://{st.secrets['ZACKS']['TENNIS_HELPER_HOST_IP']}:5000/api/files"
 
+    # Fetch data from API
+    response = requests.get(api_url, timeout=10)
+    data = response.json()
+
+    # Get today's date and current time
+    today = datetime.today()
+    current_hour = today.strftime('%H:00')
+
     # Prepare the date range for the next 7 days and their weekday names
     date_range = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
     weekdays = [(today + timedelta(days=i)).strftime('%A') for i in range(7)]
@@ -88,4 +96,5 @@ def get_realtime_tennis_court_data():
 
     # 使用 Streamlit 显示表格
     st.markdown(html_table, unsafe_allow_html=True)
+
 
