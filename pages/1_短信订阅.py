@@ -173,7 +173,7 @@ with tab2:
         st.session_state.del_subscription_id = ""
         st.query_params.del_subscription_id = ""
         st.rerun()
-        
+
     st.header("查询订阅")
     phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
     st.session_state.phone_number = phone_number
@@ -206,8 +206,6 @@ with tab2:
                     with col2:
                         # 删除按钮
                         st.write(f"订阅ID: {row['订阅ID']}")
-                        st.query_params.del_subscription_id = row['订阅ID']
-
                         if st.button(f"删除订阅 {index + 1}", type="primary"):
                             st.warning("????????????")
                             st.query_params.del_subscription_id = row['订阅ID']
