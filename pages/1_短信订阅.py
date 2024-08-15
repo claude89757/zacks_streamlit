@@ -8,14 +8,12 @@
 """
 import time
 import os
-import datetime
 import pandas as pd
 
 import streamlit as st
 from common.log_config import setup_logger
 from common.settings import common_settings_init
 from sidebar import sidebar
-from filelock import FileLock
 import uuid
 
 
@@ -33,10 +31,6 @@ sidebar()
 
 # Render Streamlit pages
 st.title("空场短信提醒")
-
-# CSV 文件路径
-CSV_FILE_PATH = "subscriptions.csv"
-LOCK_FILE_PATH = "subscriptions.csv.lock"
 
 
 # 初始化 session state
@@ -66,40 +60,25 @@ VENUE_OPTIONS = [
 # 最短时长选项
 DURATION_OPTIONS = ['1小时', '2小时', '3小时']
 
-# 检查 CSV 文件是否存在，如果不存在则创建
-if not os.path.exists(CSV_FILE_PATH):
-    df = pd.DataFrame(columns=FIELDS)
-    df.to_csv(CSV_FILE_PATH, index=False)
-
-
-# 检查 CSV 文件是否存在，如果不存在则创建
-if not os.path.exists(CSV_FILE_PATH):
-    df = pd.DataFrame(columns=FIELDS)
-    df.to_csv(CSV_FILE_PATH, index=False)
-
-
-# 检查 CSV 文件是否存在，如果不存在则创建
-if not os.path.exists(CSV_FILE_PATH):
-    df = pd.DataFrame(columns=FIELDS)
-    df.to_csv(CSV_FILE_PATH, index=False)
-
 
 # 读取 CSV 文件
-def read_csv():
-    with FileLock(LOCK_FILE_PATH):
-        return pd.read_csv(CSV_FILE_PATH)
+def read_csv(csv_file_path):
+    # 检查 CSV 文件是否存在，如果不存在则创建
+    if not os.path.exists(csv_file_path):
+        df = pd.DataFrame(columns=FIELDS)
+        df.to_csv(csv_file_path, index=False)
+    return pd.read_csv(csv_file_path)
 
 
 # 写入 CSV 文件
 def write_csv(df):
-    with FileLock(LOCK_FILE_PATH):
-        df.to_csv(CSV_FILE_PATH, index=False)
+    df.to_csv(csv_file_path, index=False)
 
 
 # 创建订阅
-def create_subscription(data):
+def create_subscription(data, csv_file_path):
     with st.spinner("creating subscription..."):
-        df = read_csv()
+        df = read_csv(csv_file_path)
         data["订阅ID"] = str(uuid.uuid4())  # 生成唯一的订阅ID
         new_row = pd.DataFrame([data])
         df = pd.concat([df, new_row], ignore_index=True)
@@ -107,25 +86,25 @@ def create_subscription(data):
 
 
 # 查询订阅
-def query_subscription(phone_number):
+def query_subscription(phone_number, csv_file_path):
     with st.spinner("querying subscription..."):
-        df = read_csv()
+        df = read_csv(csv_file_path)
         df["手机号"] = df["手机号"].astype(str)  # 确保手机号列为字符串类型
         results = df[df["手机号"].str.contains(phone_number)]
         return results
 
 
 # 删除订阅
-def delete_subscription(subscription_id):
+def delete_subscription(subscription_id, csv_file_path):
     with st.spinner("deleting subscription..."):
-        df = read_csv()
+        df = read_csv(csv_file_path)
         st.dataframe(df.head(100))
         df = df[df["订阅ID"] != subscription_id]
         st.dataframe(df.head(100))
         write_csv(df)
 
-# Stream
-# lit 页面布局
+
+# 页面布局
 tab1, tab2 = st.tabs(["创建订阅", "查询订阅"])
 
 # 创建订阅 TAB
@@ -170,10 +149,13 @@ with tab1:
         if not subscription_data["手机号"].isdigit() or len(subscription_data["手机号"]) != 11:
             st.error("请输入有效的11位手机号")
         else:
-            create_subscription(subscription_data)
+            # CSV 文件路径
+            csv_file_path = f"{subscription_data['手机号']}_subscriptions.csv"
+            create_subscription(subscription_data, csv_file_path)
             value = st.session_state.phone_number = subscription_data["手机号"]
             st.balloons()
             st.success("订阅创建成功！请关注手机短信提醒。")
+
 
 st.write(f"del_subscription_id: {st.session_state.del_subscription_id}")
 st.write(f"del_subscription_id: {st.query_params.get('del_subscription_id')}")
@@ -182,21 +164,22 @@ st.write(f"del_subscription_id: {st.query_params.get('del_subscription_id')}")
 # 查询订阅 TAB
 with tab2:
     if st.session_state.del_subscription_id or st.query_params.get("del_subscription_id"):
-
         delete_subscription(st.query_params.del_subscription_id)
         st.success(f"订阅  {st.session_state.del_subscription_id} 已删除")
         st.session_state.del_subscription_id = ""
         st.query_params.del_subscription_id = ""
+        st.rerun()
     st.header("查询订阅")
     phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
     st.session_state.phone_number = phone_number
-    if not subscription_data["手机号"].isdigit() or len(subscription_data["手机号"]) != 11:
+    if not phone_number or len(phone_number) != 11:
         st.error("请输入有效的11位手机号")
         time.sleep(1)
         st.rerun()
     else:
         if st.button("查询订阅", key="query_button_01"):
-            results = query_subscription(phone_number)
+            csv_file_path = f"{phone_number}_subscriptions.csv"
+            results = query_subscription(phone_number, csv_file_path)
             if results.empty:
                 st.warning("未找到相关订阅信息，请检查手机号是否正确。")
             else:
