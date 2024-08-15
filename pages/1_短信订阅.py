@@ -196,7 +196,7 @@ with tab2:
                     st.session_state.selected_subscription_id = None
                 st.session_state.selected_subscription_id = row["订阅ID"]
                 # Only delete if button is clicked
-                if st.button("删除订阅", key="delete_button"):
+                if st.button("删除订阅", key=f"delete_button_{index}"):
                     if st.session_state.selected_subscription_id:
                         delete_subscription(st.session_state.selected_subscription_id, CSV_FILE_PATH)
                         st.session_state.selected_subscription_id = None  # Clear the selection
