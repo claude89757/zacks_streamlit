@@ -128,3 +128,5 @@ with tab3:
         results = query_subscription(phone_number[-4:])
         selected_subscription = st.selectbox("选择要删除的订阅", results.index)
         if st.button("删除"):
+            delete_subscription(results.loc[selected_subscription, "手机号"])
+            st.success("订阅删除成功！")
