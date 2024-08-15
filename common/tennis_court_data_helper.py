@@ -29,6 +29,7 @@ def get_realtime_tennis_court_data():
     today = datetime.today()
     today_str = today.strftime("%Y-%m-%d")
     current_hour = today.strftime('%H:00')
+    current_min = today.strftime('%H:%M')
 
     # Prepare the date range for the next 7 days and their weekday names
     date_range = [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
@@ -58,11 +59,11 @@ def get_realtime_tennis_court_data():
                                 table_data[start_time][date] += f",{0}"
 
     # 将数据转换为 HTML 表格格式
-    html_table = """
+    html_table = F"""
         <table border="1" style="width:100%; text-align:center;">
           <thead>
             <tr>
-              <th style="background-color: #f2f2f2;">刷新</th>
+              <th style="background-color: #f2f2f2;">{current_min}</th>
     """
 
     # 动态获取日期列标题和星期名称
