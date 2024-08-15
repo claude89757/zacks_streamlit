@@ -63,7 +63,7 @@ def set_realtime_tennis_court_sheet():
         <table border="1" style="width:100%; text-align:center;">
           <thead>
             <tr>
-              <th style="background-color: white;">{current_min}<br>刷新</th>
+              <th style="background-color: white;">{current_min}<br>Refresh</th>
     """
 
     # 动态获取日期列标题和星期名称
@@ -82,11 +82,12 @@ def set_realtime_tennis_court_sheet():
     """
 
     # 添加每个时间段的数据
-    for time in time_slots:
+    for i, time in enumerate(time_slots):
         # 判断是否为过去或当前小时
-
         schedules = table_data[time]
-        html_table += f"<tr><td style='background-color: #f2f2f2; text-align:left;'>{time}</td>"
+        # 第一列的第二行开始的时间用淡蓝色填充
+        time_cell_style = "background-color: #ADD8E6;" if i > 0 else "background-color: #f2f2f2;"
+        html_table += f"<tr><td style='{time_cell_style} text-align:left;'>{time}</td>"
         for date in date_range:
             cell_background_color = "#f1f3f3" if (time <= current_hour and today_str in date) else "white"
             locations = schedules.get(date, "")
