@@ -47,7 +47,7 @@ if 'results' not in st.session_state:
 if 'selected_subscriptions' not in st.session_state:
     st.session_state.selected_subscriptions = []
 if 'del_subscription_id' not in st.session_state:
-    st.session_state.del_subscription_id = ""
+    st.session_state.del_subscription_id = st.query_params.get('del_subscription_id', "")
 
 
 # 订阅的字段
@@ -185,6 +185,7 @@ with tab2:
         delete_subscription(st.session_state.del_subscription_id)
         st.success(f"订阅  {st.session_state.del_subscription_id} 已删除")
         st.session_state.del_subscription_id = ""
+        st.query_params.del_subscription_id = ""
 
     if st.button("查询订阅", key="query_button_01"):
         results = query_subscription(phone_number)
@@ -207,4 +208,4 @@ with tab2:
 
                     # 删除按钮
                     if st.button(f"删除订阅 {index + 1}", key=f"delete_button_{index}"):
-                        st.session_state.del_subscription_id = row['订阅ID']
+                        st.query_params.del_subscription_id = row['订阅ID']
