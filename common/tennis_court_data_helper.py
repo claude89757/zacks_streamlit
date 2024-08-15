@@ -75,14 +75,14 @@ def get_realtime_tennis_court_data():
 
     # 添加每个时间段的数据
     for time, schedules in table_data.items():
-        html_table += f"<tr><td>{time}</td>"
+        html_table += f"<tr><td style='text-align:left;'>{time}</td>"
         for date in dates:
             locations = schedules.get(date, "")
             if not locations:
                 locations = "广告位招租"  # 显示“广告位招租”占位符
-            # 使用 <br> 实现自动换行
+            # 使用 <br> 实现自动换行并将内容左对齐
             locations = locations.replace('|', '<br>')
-            html_table += f"<td style='width:auto;'>{locations}</td>"
+            html_table += f"<td style='width:auto; text-align:left;'>{locations}</td>"
         html_table += "</tr>"
 
     html_table += """
