@@ -88,11 +88,11 @@ def set_realtime_tennis_court_sheet():
         schedules = table_data[time]
         html_table += f"<tr><td style='background-color: #f2f2f2; text-align:left;'>{time}</td>"
         for date in date_range:
-            cell_background_color = "#e3e8e8" if (time <= current_hour and today_str in date) else "white"
+            cell_background_color = "#f1f3f3" if (time <= current_hour and today_str in date) else "white"
             locations = schedules.get(date, "")
             if not locations:
                 locations = ""  # 显示“广告位招租”占位符
-                cell_background_color = "#e3e8e8"
+                cell_background_color = "#f1f3f3"
             # 使用 <br> 实现自动换行并将内容左对齐
             locations = locations.replace('|', '<br>')
             html_table += f"<td style='background-color: {cell_background_color}; width:auto; text-align:left;'>{locations}</td>"
