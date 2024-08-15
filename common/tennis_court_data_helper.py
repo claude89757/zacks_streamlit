@@ -53,8 +53,7 @@ def get_realtime_tennis_court_data():
                                 table_data[start_time][date] += f"{court_name}:{court_index}"
                             else:
                                 table_data[start_time][date] += f"|{court_index}"
-    st.write(table_data)
-    
+
     # 将数据转换为 HTML 表格格式
     html_table = """
     <table border="1" style="width:100%; text-align:center;">
