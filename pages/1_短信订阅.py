@@ -15,6 +15,8 @@ import streamlit as st
 from common.log_config import setup_logger
 from common.settings import common_settings_init
 from sidebar import sidebar
+from filelock import FileLock
+
 
 # Configure logger
 logger = setup_logger(__name__)
@@ -33,6 +35,8 @@ st.title("空场短信提醒")
 
 # CSV 文件路径
 CSV_FILE_PATH = "subscriptions.csv"
+LOCK_FILE_PATH = "subscriptions.csv.lock"
+
 
 # 初始化 session state
 if 'phone_number' not in st.session_state:
@@ -41,6 +45,8 @@ if 'results' not in st.session_state:
     st.session_state.results = pd.DataFrame()
 if 'selected_subscriptions' not in st.session_state:
     st.session_state.selected_subscriptions = []
+if 'query_triggered' not in st.session_state:
+    st.session_state.query_triggered = False
 
 
 # 订阅的字段
@@ -71,14 +77,22 @@ if not os.path.exists(CSV_FILE_PATH):
     df.to_csv(CSV_FILE_PATH, index=False)
 
 
+# 检查 CSV 文件是否存在，如果不存在则创建
+if not os.path.exists(CSV_FILE_PATH):
+    df = pd.DataFrame(columns=FIELDS)
+    df.to_csv(CSV_FILE_PATH, index=False)
+
+
 # 读取 CSV 文件
 def read_csv():
-    return pd.read_csv(CSV_FILE_PATH)
+    with FileLock(LOCK_FILE_PATH):
+        return pd.read_csv(CSV_FILE_PATH)
 
 
 # 写入 CSV 文件
 def write_csv(df):
-    df.to_csv(CSV_FILE_PATH, index=False)
+    with FileLock(LOCK_FILE_PATH):
+        df.to_csv(CSV_FILE_PATH, index=False)
 
 
 # 创建订阅
@@ -97,11 +111,11 @@ def query_subscription(phone_number):
 
 
 # 删除订阅
-def delete_subscription(phone_number, index):
-    df = read_csv()
-    df = df[df["手机号"] != phone_number].reset_index(drop=True)
-    df = df.drop(index).reset_index(drop=True)
-    write_csv(df)
+def delete_subscription(phone_number, subscription_id):
+    with FileLock(LOCK_FILE_PATH):
+        df = read_csv()
+        df = df[~((df["手机号"] == phone_number) & (df.index == subscription_id))]
+        write_csv(df)
 
 
 # Streamlit 页面布局
@@ -150,6 +164,7 @@ with tab1:
             st.error("请输入有效的11位手机号")
         else:
             create_subscription(subscription_data)
+            value = st.session_state.phone_number = subscription_data["手机号"]
             st.balloons()
             st.success("订阅创建成功！请关注手机短信提醒。")
 
@@ -157,7 +172,10 @@ with tab1:
 with tab2:
     st.header("查询订阅")
     phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
-    if st.button("查询订阅", key="query_button_01"):
+
+    if st.button("查询订阅", key="query_button_01") or st.session_state.query_triggered:
+        st.session_state.phone_number = phone_number
+        st.session_state.query_triggered = False
         results = query_subscription(phone_number)
         if results.empty:
             st.warning("未找到相关订阅信息，请检查手机号是否正确。")
@@ -178,6 +196,7 @@ with tab2:
 
                     # 删除按钮
                     if st.button(f"删除订阅 {index + 1}", key=f"delete_button_{index}"):
-                        delete_subscription(phone_number, index)
+                        delete_subscription(phone_number, row.name)
+                        st.session_state.query_triggered = True
                         st.success(f"订阅 {index + 1} 已删除")
-                        st.rerun()
+                        st.rerun()  # 重新运行以刷新页面
