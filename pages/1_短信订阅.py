@@ -166,41 +166,41 @@ with tab2:
     st.session_state.phone_number = phone_number
 
     if st.button("查询订阅", key="query_button_01"):
-        if not phone_number or len(phone_number) != 11:
+        if not st.session_state.phone_number or len(st.session_state.phone_number) != 11:
             st.error("请输入有效的11位手机号")
             time.sleep(2)
             st.rerun()
         else:
             pass
+    if st.session_state.phone_number:
+        results = query_subscription(st.session_state.phone_number, CSV_FILE_PATH)
+        if results.empty:
+            st.warning("未找到相关订阅信息，请检查手机号是否正确。")
+        else:
+            for index, row in results.iterrows():
+                col1, col2 = st.columns(2)
+                with col1:
+                    with st.expander(f"订阅 {index + 1}: {row['订阅场地']} {row['订阅状态']}"):
+                        st.write(f"**开始日期**: {row['开始日期']}")
+                        st.write(f"**结束日期**: {row['结束日期']}")
+                        st.write(f"**开始时间**: {row['开始时间']}")
+                        st.write(f"**结束时间**: {row['结束时间']}")
+                        st.write(f"**最短时长**: {row['最短时长']}")
+                        st.write(f"**今天短信**: {row['今天短信']}")
+                        st.write(f"**累计短信**: {row['累计短信']}")
+                        st.write(f"**手机尾号**: {row['手机尾号']}")
+                        st.write(f"**用户等级**: {row['用户等级']}")
+                        st.write(f"**创建时间**: {row['创建时间']}")
+                        st.write(f"**昵称**: {row['昵称']}")
 
-    results = query_subscription(phone_number, CSV_FILE_PATH)
-    if results.empty:
-        st.warning("未找到相关订阅信息，请检查手机号是否正确。")
-    else:
-        for index, row in results.iterrows():
-            col1, col2 = st.columns(2)
-            with col1:
-                with st.expander(f"订阅 {index + 1}: {row['订阅场地']} {row['订阅状态']}"):
-                    st.write(f"**开始日期**: {row['开始日期']}")
-                    st.write(f"**结束日期**: {row['结束日期']}")
-                    st.write(f"**开始时间**: {row['开始时间']}")
-                    st.write(f"**结束时间**: {row['结束时间']}")
-                    st.write(f"**最短时长**: {row['最短时长']}")
-                    st.write(f"**今天短信**: {row['今天短信']}")
-                    st.write(f"**累计短信**: {row['累计短信']}")
-                    st.write(f"**手机尾号**: {row['手机尾号']}")
-                    st.write(f"**用户等级**: {row['用户等级']}")
-                    st.write(f"**创建时间**: {row['创建时间']}")
-                    st.write(f"**昵称**: {row['昵称']}")
-
-            with col2:
-                if 'selected_subscription_id' not in st.session_state:
-                    st.session_state.selected_subscription_id = None
-                st.session_state.selected_subscription_id = row["订阅ID"]
-                # Only delete if button is clicked
-                if st.button("删除订阅", key=f"delete_button_{index}"):
-                    if st.session_state.selected_subscription_id:
-                        delete_subscription(st.session_state.selected_subscription_id, CSV_FILE_PATH)
-                        st.session_state.selected_subscription_id = None  # Clear the selection
-                        st.success("订阅删除成功！")
-                        st.rerun()  # Refresh page to update subscription list
+                with col2:
+                    if 'selected_subscription_id' not in st.session_state:
+                        st.session_state.selected_subscription_id = None
+                    st.session_state.selected_subscription_id = row["订阅ID"]
+                    # Only delete if button is clicked
+                    if st.button("删除订阅", key=f"delete_button_{index}"):
+                        if st.session_state.selected_subscription_id:
+                            delete_subscription(st.session_state.selected_subscription_id, CSV_FILE_PATH)
+                            st.session_state.selected_subscription_id = None  # Clear the selection
+                            st.success("订阅删除成功！")
+                            st.rerun()  # Refresh page to update subscription list
