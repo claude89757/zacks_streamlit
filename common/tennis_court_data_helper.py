@@ -54,6 +54,15 @@ def get_realtime_tennis_court_data():
                             else:
                                 table_data[start_time][date] += f",{court_index}"
 
+    # 显示为卡片
+    for time, schedules in table_data.items():
+        st.markdown(f"### {time}")
+        for date, locations in schedules.items():
+            st.markdown(f"**{date}**")
+            locations = locations.replace('|', ', ')
+            st.write(locations)
+            st.markdown("---")
+    
     # 将数据转换为 HTML 表格格式
     html_table = """
     <table border="1" style="width:100%; text-align:center;">
@@ -92,6 +101,8 @@ def get_realtime_tennis_court_data():
 
     # 使用 Streamlit 显示表格
     st.markdown(html_table, unsafe_allow_html=True)
+
+
 
     # # Remove trailing commas and deduplicate court names
     # for time_slot in table_data:
