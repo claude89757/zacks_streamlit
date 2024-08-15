@@ -93,14 +93,31 @@ tab1, tab2, tab3 = st.tabs(["创建订阅", "查询订阅", "删除订阅"])
 with tab1:
     st.header("创建订阅")
     subscription_data = {}
-    subscription_data["订阅场地"] = st.selectbox("订阅场地", VENUE_OPTIONS)
-    subscription_data["最短时长"] = st.selectbox("最短时长", DURATION_OPTIONS)
-    subscription_data["开始日期"] = st.date_input("开始日期")
-    subscription_data["结束日期"] = st.date_input("结束日期")
-    subscription_data["开始时间"] = st.time_input("开始时间", value=pd.to_datetime("18:00").time())
-    subscription_data["结束时间"] = st.time_input("结束时间", value=pd.to_datetime("22:00").time())
-    subscription_data["手机号"] = st.text_input("手机号")
-    subscription_data["昵称"] = st.text_input("昵称（可选）")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        subscription_data["订阅场地"] = st.selectbox("订阅场地", VENUE_OPTIONS)
+    with col2:
+        subscription_data["最短时长"] = st.selectbox("最短时长", DURATION_OPTIONS)
+
+    col3, col4 = st.columns(2)
+    with col3:
+        subscription_data["开始日期"] = st.date_input("开始日期")
+    with col4:
+        subscription_data["结束日期"] = st.date_input("结束日期")
+
+    col5, col6 = st.columns(2)
+    with col5:
+        subscription_data["开始时间"] = st.time_input("开始时间", value=pd.to_datetime("18:00").time())
+    with col6:
+        subscription_data["结束时间"] = st.time_input("结束时间", value=pd.to_datetime("22:00").time())
+
+    col7, col8 = st.columns(2)
+    with col7:
+        subscription_data["手机号"] = st.text_input("手机号")
+    with col8:
+        subscription_data["昵称"] = st.text_input("昵称（可选）")
+
     subscription_data["订阅状态"] = "运行中"
     subscription_data["今天短信"] = "-"
     subscription_data["累计短信"] = "-"
@@ -108,7 +125,8 @@ with tab1:
     subscription_data["用户等级"] = "VIP"
     subscription_data["创建时间"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
-    if st.button("提交"):
+    # 提交按钮
+    if st.button("提交", key="submit_button", help="点击提交订阅信息"):
         # 手机号验证
         if not subscription_data["手机号"].isdigit() or len(subscription_data["手机号"]) != 11:
             st.error("请输入有效的11位手机号")
