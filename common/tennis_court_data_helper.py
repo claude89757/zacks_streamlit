@@ -53,17 +53,17 @@ def set_realtime_tennis_court_sheet():
                         start_time, end_time = slot
                         if start_time in table_data and date in table_data[start_time]:
                             if court_name not in table_data[start_time][date]:
-                                table_data[start_time][date] += f"|{court_name}(1)"
+                                table_data[start_time][date] += f"|{court_name}:{0}"
                             else:
-                                table_data[start_time][date] += f""
+                                table_data[start_time][date] += f",{0}"
                             table_data[start_time][date] = table_data[start_time][date].strip("|")
 
     # 将数据转换为 HTML 表格格式
     html_table = F"""
-        <table border="1" style="width:100%; text-align:center;">
+        <table border="1" style="width:100%; text-align:center; table-layout: auto;">
           <thead>
             <tr>
-              <th style="background-color: white;">{current_min}<br>Refresh</th>
+              <th style="background-color: white; white-space: nowrap;">{current_min}<br>Refresh</th>
     """
 
     # 动态获取日期列标题和星期名称
@@ -71,9 +71,9 @@ def set_realtime_tennis_court_sheet():
         weekday_cn = {'Monday': '星期一', 'Tuesday': '星期二', 'Wednesday': '星期三', 'Thursday': '星期四',
                       'Friday': '星期五', 'Saturday': '星期六', 'Sunday': '星期日'}[weekday]
         if weekday_cn in ["星期六", "星期日"]:
-            html_table += f"<th style='background-color: #00BFFF; width:auto;'>{weekday_cn}<br>{date[5:]}</th>"
+            html_table += f"<th style='background-color: #00BFFF; width:auto; white-space: nowrap;'>{weekday_cn}<br>{date[5:]}</th>"
         else:
-            html_table += f"<th style='background-color: #7DF9FF; width:auto;'>{weekday_cn}<br>{date[5:]}</th>"
+            html_table += f"<th style='background-color: #7DF9FF; width:auto; white-space: nowrap;'>{weekday_cn}<br>{date[5:]}</th>"
 
     html_table += """
             </tr>
@@ -86,8 +86,8 @@ def set_realtime_tennis_court_sheet():
         # 判断是否为过去或当前小时
         schedules = table_data[time]
         # 第一列的第二行开始的时间用淡蓝色填充
-        time_cell_style = "background-color: #fcfeff;" if i >= 4 else "background-color: #ffe3e0;"
-        html_table += f"<tr><td style='{time_cell_style} text-align:left;'>{time}</td>"
+        time_cell_style = "background-color: #ADD8E6;" if i > 0 else "background-color: #f2f2f2;"
+        html_table += f"<tr><td style='{time_cell_style} text-align:left; white-space: nowrap;'>{time}</td>"
         for date in date_range:
             cell_background_color = "#f5f5f5" if (time <= current_hour and today_str in date) else "white"
             locations = schedules.get(date, "")
@@ -96,7 +96,7 @@ def set_realtime_tennis_court_sheet():
                 cell_background_color = "#f5f5f5"
             # 使用 <br> 实现自动换行并将内容左对齐
             locations = locations.replace('|', '<br>')
-            html_table += f"<td style='background-color: {cell_background_color}; width:auto; text-align:left;'>{locations}</td>"
+            html_table += f"<td style='background-color: {cell_background_color}; width:auto; text-align:left; white-space: nowrap;'>{locations}</td>"
         html_table += "</tr>"
 
     html_table += """
