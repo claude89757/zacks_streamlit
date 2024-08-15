@@ -78,5 +78,3 @@ def sidebar():
     st.sidebar.markdown("**Keep up the good work!**")
     st.sidebar.markdown("Thank you for using our app.")
 
-# Call the sidebar function to display the statistics
-sidebar()
