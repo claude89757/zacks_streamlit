@@ -27,7 +27,6 @@ if not os.path.exists(DATA_FILE):
 else:
     with open(DATA_FILE, "r") as f:
         data = json.load(f)
-        data["users"] = set(data["users"])  # Convert list back to set for users
 
 # Get the current date and month
 current_date = datetime.now().strftime("%Y-%m-%d")
