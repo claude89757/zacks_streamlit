@@ -22,7 +22,7 @@ def get_realtime_tennis_court_data():
     api_url = f"http://{st.secrets['ZACKS']['TENNIS_HELPER_HOST_IP']}:5000/api/files"
 
     # Fetch data from API
-    response = requests.get(api_url)
+    response = requests.get(api_url, timeout=10)
     data = response.json()
 
     # Get today's date
