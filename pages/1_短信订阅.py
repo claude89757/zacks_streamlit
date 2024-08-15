@@ -92,6 +92,7 @@ def query_subscription(phone_number, csv_file_path):
         df = read_csv(csv_file_path)
         df["手机号"] = df["手机号"].astype(str)  # 确保手机号列为字符串类型
         results = df[df["手机号"].str.contains(phone_number)]
+        time.sleep(3)
         return results
 
 
@@ -103,6 +104,7 @@ def delete_subscription(subscription_id, csv_file_path):
         df = df[df["订阅ID"] != subscription_id]
         st.dataframe(df.head(100))
         write_csv(df)
+        time.sleep(3)
 
 
 # 页面布局
@@ -157,7 +159,9 @@ with tab1:
             st.balloons()
             st.success("订阅创建成功！请关注手机短信提醒。")
 
+st.write("query_params")
 st.write(st.query_params)
+st.write("session_state")
 st.write(st.session_state)
 
 # 查询订阅 TAB
