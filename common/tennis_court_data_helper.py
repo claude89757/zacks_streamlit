@@ -86,7 +86,7 @@ def set_realtime_tennis_court_sheet():
         # 判断是否为过去或当前小时
         schedules = table_data[time]
         # 第一列的第二行开始的时间用淡蓝色填充
-        time_cell_style = "background-color: #ededed;" if i >= 4 else "background-color: #ffe3e0;"
+        time_cell_style = "background-color: #fcfeff;" if i >= 4 else "background-color: #ffe3e0;"
         html_table += f"<tr><td style='{time_cell_style} text-align:left;'>{time}</td>"
         for date in date_range:
             cell_background_color = "#f1f3f3" if (time <= current_hour and today_str in date) else "white"
