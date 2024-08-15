@@ -71,44 +71,44 @@ def get_realtime_tennis_court_data():
                 st.markdown("---")
         counter += 1
 
-    # 将数据转换为 HTML 表格格式
-    html_table = """
-    <table border="1" style="width:100%; text-align:center;">
-      <thead>
-        <tr>
-          <th>时间</th>
-    """
-
-    # 动态获取日期列标题
-    dates = list(next(iter(table_data.values())).keys())
-    for date in dates:
-        html_table += f"<th style='width:auto;'>{date}</th>"
-
-    html_table += """
-        </tr>
-      </thead>
-      <tbody>
-    """
-
-    # 添加每个时间段的数据
-    for time, schedules in table_data.items():
-        html_table += f"<tr><td style='text-align:left;'>{time}</td>"
-        for date in dates:
-            locations = schedules.get(date, "")
-            if not locations:
-                locations = "广告位招租"  # 显示“广告位招租”占位符
-            # 使用 <br> 实现自动换行并将内容左对齐
-            locations = locations.replace('|', '<br>')
-            html_table += f"<td style='width:auto; text-align:left;'>{locations}</td>"
-        html_table += "</tr>"
-
-    html_table += """
-      </tbody>
-    </table>
-    """
-
-    # 使用 Streamlit 显示表格
-    st.markdown(html_table, unsafe_allow_html=True)
+    # # 将数据转换为 HTML 表格格式
+    # html_table = """
+    # <table border="1" style="width:100%; text-align:center;">
+    #   <thead>
+    #     <tr>
+    #       <th>时间</th>
+    # """
+    #
+    # # 动态获取日期列标题
+    # dates = list(next(iter(table_data.values())).keys())
+    # for date in dates:
+    #     html_table += f"<th style='width:auto;'>{date}</th>"
+    #
+    # html_table += """
+    #     </tr>
+    #   </thead>
+    #   <tbody>
+    # """
+    #
+    # # 添加每个时间段的数据
+    # for time, schedules in table_data.items():
+    #     html_table += f"<tr><td style='text-align:left;'>{time}</td>"
+    #     for date in dates:
+    #         locations = schedules.get(date, "")
+    #         if not locations:
+    #             locations = "广告位招租"  # 显示“广告位招租”占位符
+    #         # 使用 <br> 实现自动换行并将内容左对齐
+    #         locations = locations.replace('|', '<br>')
+    #         html_table += f"<td style='width:auto; text-align:left;'>{locations}</td>"
+    #     html_table += "</tr>"
+    #
+    # html_table += """
+    #   </tbody>
+    # </table>
+    # """
+    #
+    # # 使用 Streamlit 显示表格
+    # st.markdown(html_table, unsafe_allow_html=True)
 
 
 
