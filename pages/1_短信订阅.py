@@ -205,4 +205,5 @@ with tab2:
                         delete_subscription(row['订阅ID'])  # 使用订阅ID进行删除
                         st.session_state.query_triggered = True
                         st.success(f"订阅 {index + 1} 已删除, ID: {row['订阅ID']}")
+                        time.sleep(10)
                         # st.rerun()  # 重新运行以刷新页面
