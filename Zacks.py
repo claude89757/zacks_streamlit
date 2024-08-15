@@ -27,7 +27,7 @@ st.set_page_config(page_title="Zacks", page_icon="🎾", layout="wide")
 common_settings_init()
 
 # Init sidebar
-sidebar()
+# sidebar()
 
 # Render Streamlit pages
 st.title("深圳热门网球场实时动态")
