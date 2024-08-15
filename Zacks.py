@@ -30,9 +30,9 @@ common_settings_init()
 sidebar()
 
 # Render Streamlit pages
-st.title("Zacks")
+st.subheader("深圳热门网球场实时动态")
 
-st.markdown("This is new Zacks Web!")
+st.markdown("场地预定方式请看侧边栏")
 
 # Get realtime tennis court data
 data_df = get_realtime_tennis_court_data()

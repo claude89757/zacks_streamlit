@@ -91,7 +91,7 @@ def get_realtime_tennis_court_data():
             cell_background_color = "#d3d3d3" if time <= current_hour and today_str in data else "white"
             locations = schedules.get(date, "")
             if not locations:
-                locations = "广告位招租"  # 显示“广告位招租”占位符
+                locations = ""  # 显示“广告位招租”占位符
             # 使用 <br> 实现自动换行并将内容左对齐
             locations = locations.replace('|', '<br>')
             html_table += f"<td style='background-color: {cell_background_color}; width:auto; text-align:left;'>{locations}</td>"
