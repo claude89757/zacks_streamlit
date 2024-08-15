@@ -81,9 +81,9 @@ def create_subscription(data):
 
 
 # 查询订阅
-def query_subscription(phone_suffix):
+def query_subscription(phone_number):
     df = read_csv()
-    return df[df["手机尾号"].str.contains(phone_suffix)]
+    return df[df["手机号"].str.contains(phone_number)]
 
 
 # 删除订阅
@@ -145,11 +145,11 @@ with tab1:
 # 查询订阅 TAB
 with tab2:
     st.header("查询订阅")
-    phone_suffix = st.text_input("输入手机尾号")
+    phone_number = st.text_input("输入手机号")
     if st.button("查询"):
-        results = query_subscription(phone_suffix)
+        results = query_subscription(phone_number)
         if results.empty:
-            st.warning("未找到相关订阅信息，请检查手机尾号是否正确。")
+            st.warning("未找到相关订阅信息，请检查手机号是否正确。")
         else:
             for index, row in results.iterrows():
                 with st.expander(f"订阅 {index + 1}"):
