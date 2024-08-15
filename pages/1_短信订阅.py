@@ -224,19 +224,19 @@ with tab3:
                 axis=1
             ).tolist()
 
-        selected_index = st.selectbox("选择要删除的订阅", range(len(display_options)),
-                                      format_func=lambda x: display_options[x])
+            selected_index = st.selectbox("选择要删除的订阅", range(len(display_options)),
+                                          format_func=lambda x: display_options[x])
 
-        # Store the selected subscription ID in session state
-        if 'selected_subscription_id' not in st.session_state:
-            st.session_state.selected_subscription_id = None
+            # Store the selected subscription ID in session state
+            if 'selected_subscription_id' not in st.session_state:
+                st.session_state.selected_subscription_id = None
 
-        st.session_state.selected_subscription_id = results.iloc[selected_index]["订阅ID"]
+            st.session_state.selected_subscription_id = results.iloc[selected_index]["订阅ID"]
 
-        # Only delete if button is clicked
-        if st.button("删除订阅", key="delete_button"):
-            if st.session_state.selected_subscription_id:
-                delete_subscription(st.session_state.selected_subscription_id, csv_file_path)
-                st.session_state.selected_subscription_id = None  # Clear the selection
-                st.success("订阅删除成功！")
-                st.rerun()  # Refresh page to update subscription list
+            # Only delete if button is clicked
+            if st.button("删除订阅", key="delete_button"):
+                if st.session_state.selected_subscription_id:
+                    delete_subscription(st.session_state.selected_subscription_id, csv_file_path)
+                    st.session_state.selected_subscription_id = None  # Clear the selection
+                    st.success("订阅删除成功！")
+                    st.rerun()  # Refresh page to update subscription list
