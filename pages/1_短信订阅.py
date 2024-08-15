@@ -226,8 +226,16 @@ with tab3:
             selected_index = st.selectbox("选择要删除的订阅", range(len(display_options)),
                                           format_func=lambda x: display_options[x])
 
+            # Store the selected subscription ID in session state
+            if 'selected_subscription_id' not in st.session_state:
+                st.session_state.selected_subscription_id = None
+
+            st.session_state.selected_subscription_id = results.iloc[selected_index]["订阅ID"]
+
+            # Only delete if button is clicked
             if st.button("删除订阅", key="delete_button"):
-                selected_subscription_id = results.iloc[selected_index]["订阅ID"]
-                delete_subscription(selected_subscription_id, csv_file_path)
-                st.success("订阅删除成功！")
-                st.rerun()  # 刷新页面以更新订阅列表
+                if st.session_state.selected_subscription_id:
+                    delete_subscription(st.session_state.selected_subscription_id, csv_file_path)
+                    st.session_state.selected_subscription_id = None  # Clear the selection
+                    st.success("订阅删除成功！")
+                    st.rerun()  # Refresh page to update subscription list
