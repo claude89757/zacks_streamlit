@@ -209,3 +209,4 @@ with tab2:
                     # 删除按钮
                     if st.button(f"删除订阅 {index + 1}", key=f"delete_button_{index}"):
                         st.query_params.del_subscription_id = row['订阅ID']
+                        st.rerun()
