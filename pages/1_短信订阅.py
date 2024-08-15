@@ -156,7 +156,7 @@ with tab1:
 with tab2:
     st.header("查询订阅")
     phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
-    if st.button("查询订阅"):
+    if st.button("查询订阅", key="query_button_01"):
         results = query_subscription(phone_number)
         if results.empty:
             st.warning("未找到相关订阅信息，请检查手机号是否正确。")
@@ -180,7 +180,7 @@ with tab2:
 with tab3:
     st.header("删除订阅")
     phone_number = st.text_input("输入手机号", value=st.session_state.phone_number)
-    if st.button("查询订阅"):
+    if st.button("查询订阅", key="query_button_02"):
         st.session_state.results = query_subscription(phone_number)
         st.session_state.phone_number = phone_number
 
