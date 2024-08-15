@@ -51,7 +51,7 @@ def get_realtime_tennis_court_data():
                         start_time, end_time = slot
                         if start_time in table_data and date in table_data[start_time]:
                             if court_name not in table_data[start_time][date]:
-                                table_data[start_time][date] += f"{court_name}:{court_index}|"
+                                table_data[start_time][date] += f"{court_name}:{court_index}"
                             else:
                                 table_data[start_time][date] += f"|{court_index}"
     st.write(table_data)
