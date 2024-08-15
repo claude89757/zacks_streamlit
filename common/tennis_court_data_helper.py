@@ -63,12 +63,12 @@ def get_realtime_tennis_court_data():
         <table border="1" style="width:100%; text-align:center;">
           <thead>
             <tr>
-              <th style="background-color: #f2f2f2;">{current_min}<br>刷新</th>
+              <th style="background-color: white;">{current_min}<br>刷新</th>
     """
 
     # 动态获取日期列标题和星期名称
     for weekday, date in zip(weekdays, date_range):
-        html_table += f"<th style='background-color: #f2f2f2; width:auto;'>{weekday}<br>{date[5:]}</th>"
+        html_table += f"<th style='background-color: blue; width:auto;'>{weekday}<br>{date[5:]}</th>"
 
     html_table += """
             </tr>
