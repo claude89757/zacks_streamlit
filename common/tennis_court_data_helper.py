@@ -77,10 +77,11 @@ def get_realtime_tennis_court_data():
     # 添加每个时间段的数据
     for time in time_slots:
         # 判断是否为过去或当前小时
-        cell_background_color = "#d3d3d3" if time <= current_hour else "white"
+
         schedules = table_data[time]
         html_table += f"<tr><td style='background-color: #f2f2f2; text-align:left;'>{time}</td>"
         for date in date_range:
+            cell_background_color = "#d3d3d3" if time <= current_hour and today in data else "white"
             locations = schedules.get(date, "")
             if not locations:
                 locations = "广告位招租"  # 显示“广告位招租”占位符
@@ -96,5 +97,3 @@ def get_realtime_tennis_court_data():
 
     # 使用 Streamlit 显示表格
     st.markdown(html_table, unsafe_allow_html=True)
-
-
