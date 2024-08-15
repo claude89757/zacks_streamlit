@@ -83,6 +83,7 @@ def create_subscription(data):
 # 查询订阅
 def query_subscription(phone_number):
     df = read_csv()
+    df["手机号"] = df["手机号"].astype(str)  # 确保手机号列为字符串类型
     return df[df["手机号"].str.contains(phone_number)]
 
 
