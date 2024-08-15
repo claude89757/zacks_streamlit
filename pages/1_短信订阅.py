@@ -16,6 +16,7 @@ from common.log_config import setup_logger
 from common.settings import common_settings_init
 from sidebar import sidebar
 from filelock import FileLock
+import uuid
 
 
 # Configure logger
@@ -98,6 +99,7 @@ def write_csv(df):
 # 创建订阅
 def create_subscription(data):
     df = read_csv()
+    data["订阅ID"] = str(uuid.uuid4())  # 生成唯一的订阅ID
     new_row = pd.DataFrame([data])
     df = pd.concat([df, new_row], ignore_index=True)
     write_csv(df)
@@ -107,14 +109,15 @@ def create_subscription(data):
 def query_subscription(phone_number):
     df = read_csv()
     df["手机号"] = df["手机号"].astype(str)  # 确保手机号列为字符串类型
-    return df[df["手机号"].str.contains(phone_number)]
+    results = df[df["手机号"].str.contains(phone_number)]
+    return results
 
 
 # 删除订阅
-def delete_subscription(phone_number, subscription_id):
+def delete_subscription(subscription_id):
     with FileLock(LOCK_FILE_PATH):
         df = read_csv()
-        df = df[~((df["手机号"] == phone_number) & (df.index == subscription_id))]
+        df = df[df["订阅ID"] != subscription_id]
         write_csv(df)
 
 
@@ -168,6 +171,7 @@ with tab1:
             st.balloons()
             st.success("订阅创建成功！请关注手机短信提醒。")
 
+
 # 查询订阅 TAB
 with tab2:
     st.header("查询订阅")
@@ -195,8 +199,8 @@ with tab2:
                     st.write(f"**昵称**: {row['昵称']}")
 
                     # 删除按钮
-                    if st.button(f"删除订阅 {index + 1}", key=f"delete_button_{index}", type="primary"):
-                        delete_subscription(phone_number, row.name)
+                    if st.button(f"删除订阅 {index + 1}", key=f"delete_button_{index}"):
+                        delete_subscription(row['订阅ID'])  # 使用订阅ID进行删除
                         st.session_state.query_triggered = True
                         st.success(f"订阅 {index + 1} 已删除")
                         st.rerun()  # 重新运行以刷新页面
