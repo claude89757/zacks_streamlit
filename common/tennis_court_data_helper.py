@@ -109,8 +109,12 @@ def set_realtime_tennis_court_sheet():
                     # 获取场地号
                     try:
                         court_index = COURT_NAME_INFOS.get(int(court_index), court_index).split("号")[0]
-                    except ValueError as error:
+                    except ValueError:
                         court_index = str(court_index).split("号")[0]
+                    if len(court_index) > 3:
+                        court_index = "*"
+                    else:
+                        pass
                     for slot in slots:
                         start_time, end_time = slot
                         if start_time in table_data and date in table_data[start_time]:
