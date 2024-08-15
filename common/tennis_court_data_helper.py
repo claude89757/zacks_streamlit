@@ -54,6 +54,7 @@ def get_realtime_tennis_court_data():
                                 table_data[start_time][date] += f"{court_name}:{court_index}|"
                             else:
                                 table_data[start_time][date] += f"|{court_index}"
+    st.write(table_data)
 
     # # Remove trailing commas and deduplicate court names
     # for time_slot in table_data:
