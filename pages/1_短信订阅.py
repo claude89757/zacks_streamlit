@@ -203,10 +203,10 @@ with tab2:
                         st.write(f"**昵称**: {row['昵称']}")
 
     # 删除按钮
-    st.write(f"订阅ID: {row['订阅ID']}")
+    st.write(f"订阅ID")
     if st.button(f"删除订阅 {index + 1}", type="primary"):
         st.warning("????????????")
-        st.query_params.del_subscription_id = row['订阅ID']
-        st.session_state.del_subscription_id = row['订阅ID']
+        # st.query_params.del_subscription_id = row['订阅ID']
+        # st.session_state.del_subscription_id = row['订阅ID']
         time.sleep(3)
         st.rerun()
