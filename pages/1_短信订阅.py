@@ -34,13 +34,7 @@ st.title("空场短信提醒")
 # 初始化 session state
 if 'phone_number' not in st.session_state:
     st.session_state.phone_number = ''
-if 'results' not in st.session_state:
-    st.session_state.results = pd.DataFrame()
-if 'selected_subscriptions' not in st.session_state:
-    st.session_state.selected_subscriptions = []
-if 'del_subscription_id' not in st.session_state:
-    st.session_state.del_subscription_id = st.query_params.get('del_subscription_id', "")
-
+    
 # 订阅的字段
 FIELDS = [
     "订阅场地", "开始日期", "结束日期", "开始时间", "结束时间", "最短时长", "订阅状态",
