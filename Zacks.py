@@ -34,3 +34,15 @@ st.title("深圳热门网球场实时动态")
 
 # Get realtime tennis court data
 set_realtime_tennis_court_sheet()
+
+# 创建选项卡
+tab1, tab2, tab3 = st.tabs(["自定义名称1", "自定义名称2", "自定义名称3"])
+
+with tab1:
+    st.write("这是自定义名称1的内容")
+
+with tab2:
+    st.write("这是自定义名称2的内容")
+
+with tab3:
+    st.write("这是自定义名称3的内容")
