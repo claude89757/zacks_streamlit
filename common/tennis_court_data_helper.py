@@ -54,6 +54,28 @@ def get_realtime_tennis_court_data():
                             else:
                                 table_data[start_time][date] += f",{0}"
 
+    # 将数据转换为 DataFrame
+    data = []
+    dates = list(next(iter(table_data.values())).keys())
+
+    for time, schedules in table_data.items():
+        row = {"时间": time}
+        for date in dates:
+            locations = schedules.get(date, "")
+            if not locations:
+                locations = "广告位招租"
+            row[date] = locations.replace('|', '\n')
+        data.append(row)
+
+    df = pd.DataFrame(data)
+
+    # 使用 Streamlit 显示表格
+    st.dataframe(df.style.set_properties(**{'text-align': 'left'}).set_table_styles([
+        {'selector': 'thead th', 'props': 'background-color: lightgrey; font-weight: bold;'},
+        {'selector': 'tbody td', 'props': 'text-align: left;'}
+    ]))
+
+
     # 将数据转换为 HTML 表格格式
     html_table = """
     <table border="1" style="width:100%; text-align:center;">
