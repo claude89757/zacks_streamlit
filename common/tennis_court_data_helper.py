@@ -53,9 +53,9 @@ def set_realtime_tennis_court_sheet():
                         start_time, end_time = slot
                         if start_time in table_data and date in table_data[start_time]:
                             if court_name not in table_data[start_time][date]:
-                                table_data[start_time][date] += f"|{court_name}:{0}"
+                                table_data[start_time][date] += f"|{court_name}"
                             else:
-                                table_data[start_time][date] += f",{0}"
+                                table_data[start_time][date] += f""
                             table_data[start_time][date] = table_data[start_time][date].strip("|")
 
     # 将数据转换为 HTML 表格格式
