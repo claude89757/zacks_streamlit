@@ -178,12 +178,14 @@ with tab2:
         else:
             pass
 
-        csv_file_path = f"{phone_number}_subscriptions.csv"
-        results = query_subscription(phone_number, csv_file_path)
-        if results.empty:
-            st.warning("未找到相关订阅信息，请检查手机号是否正确。")
-        else:
-            for index, row in results.iterrows():
+    csv_file_path = f"{phone_number}_subscriptions.csv"
+    results = query_subscription(phone_number, csv_file_path)
+    if results.empty:
+        st.warning("未找到相关订阅信息，请检查手机号是否正确。")
+    else:
+        for index, row in results.iterrows():
+            col1, col2 = st.columns(2)
+            with col1:
                 with st.expander(f"订阅 {index + 1}: {row['订阅场地']} {row['订阅状态']}"):
                     st.write(f"**开始日期**: {row['开始日期']}")
                     st.write(f"**结束日期**: {row['结束日期']}")
@@ -196,6 +198,18 @@ with tab2:
                     st.write(f"**用户等级**: {row['用户等级']}")
                     st.write(f"**创建时间**: {row['创建时间']}")
                     st.write(f"**昵称**: {row['昵称']}")
+
+            with col2:
+                if 'selected_subscription_id' not in st.session_state:
+                    st.session_state.selected_subscription_id = None
+                st.session_state.selected_subscription_id = row["订阅ID"]
+                # Only delete if button is clicked
+                if st.button("删除订阅", key="delete_button"):
+                    if st.session_state.selected_subscription_id:
+                        delete_subscription(st.session_state.selected_subscription_id, csv_file_path)
+                        st.session_state.selected_subscription_id = None  # Clear the selection
+                        st.success("订阅删除成功！")
+                        st.rerun()  # Refresh page to update subscription list
 
 # 删除订阅 TAB
 with tab3:
