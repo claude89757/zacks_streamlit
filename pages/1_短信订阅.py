@@ -96,7 +96,7 @@ with tab1:
     subscription_data["订阅场地"] = st.selectbox("订阅场地", VENUE_OPTIONS)
     subscription_data["最短时长"] = st.selectbox("最短时长", DURATION_OPTIONS)
     subscription_data["开始日期"] = st.date_input("开始日期")
-    subscription_data["结束日期"] = st.date_input("结束日期", value=pd.to_datetime("tomorrow").date())
+    subscription_data["结束日期"] = st.date_input("结束日期")
     subscription_data["开始时间"] = st.time_input("开始时间", value=pd.to_datetime("18:00").time())
     subscription_data["结束时间"] = st.time_input("结束时间", value=pd.to_datetime("22:00").time())
     subscription_data["手机号"] = st.text_input("手机号")
