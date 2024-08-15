@@ -106,8 +106,10 @@ def delete_subscription(subscription_id, CSV_FILE_PATH):
         write_csv(df)
         time.sleep(1)
 
+
 # 页面布局
-tab1, tab2, tab3 = st.tabs(["创建订阅", "查询订阅", "删除订阅"])
+tab1, tab2 = st.tabs(["创建订阅", "查询订阅"])
+
 
 # 创建订阅 TAB
 with tab1:
