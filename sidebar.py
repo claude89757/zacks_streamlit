@@ -40,12 +40,13 @@ data["monthly_visits"][current_month] = data["monthly_visits"].get(current_month
 
 # Update the user count
 if "phone_number" in st.session_state:
-    data["users"].add(st.session_state["phone_number"])
+    data["users"].append(st.session_state["phone_number"])
 
 # Save the updated data back to the file
 data["users"] = list(data["users"])  # Convert set to list for JSON serialization
 with open(DATA_FILE, "w") as f:
     json.dump(data, f)
+
 
 # Sidebar component to display the statistics
 def sidebar():
