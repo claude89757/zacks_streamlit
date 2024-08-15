@@ -98,30 +98,32 @@ def write_csv(df):
 
 # 创建订阅
 def create_subscription(data):
-    df = read_csv()
-    data["订阅ID"] = str(uuid.uuid4())  # 生成唯一的订阅ID
-    new_row = pd.DataFrame([data])
-    df = pd.concat([df, new_row], ignore_index=True)
-    write_csv(df)
+    with st.spinner("creating subscription..."):
+        df = read_csv()
+        data["订阅ID"] = str(uuid.uuid4())  # 生成唯一的订阅ID
+        new_row = pd.DataFrame([data])
+        df = pd.concat([df, new_row], ignore_index=True)
+        write_csv(df)
 
 
 # 查询订阅
 def query_subscription(phone_number):
-    df = read_csv()
-    df["手机号"] = df["手机号"].astype(str)  # 确保手机号列为字符串类型
-    results = df[df["手机号"].str.contains(phone_number)]
-    return results
+    with st.spinner("querying subscription..."):
+        df = read_csv()
+        df["手机号"] = df["手机号"].astype(str)  # 确保手机号列为字符串类型
+        results = df[df["手机号"].str.contains(phone_number)]
+        return results
 
 
 # 删除订阅
 def delete_subscription(subscription_id):
-    st.write(f"deleting ...{subscription_id}")
-    with FileLock(LOCK_FILE_PATH):
-        df = read_csv()
-        st.dataframe(df.head(100))
-        df = df[df["订阅ID"] != subscription_id]
-        st.dataframe(df.head(100))
-        write_csv(df)
+    with st.spinner("deleting subscription..."):
+        with FileLock(LOCK_FILE_PATH):
+            df = read_csv()
+            st.dataframe(df.head(100))
+            df = df[df["订阅ID"] != subscription_id]
+            st.dataframe(df.head(100))
+            write_csv(df)
 
 
 # Streamlit 页面布局
@@ -186,7 +188,6 @@ with tab2:
         st.success(f"订阅  {st.session_state.del_subscription_id} 已删除")
         st.session_state.del_subscription_id = ""
         st.query_params.del_subscription_id = ""
-        st.session_state
     st.header("查询订阅")
     phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
     st.session_state.phone_number = phone_number
