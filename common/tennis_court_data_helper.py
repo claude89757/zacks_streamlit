@@ -61,7 +61,7 @@ def get_realtime_tennis_court_data():
     counter = 0
 
     # 显示卡片内容
-    for time, schedules in data.items():
+    for time, schedules in table_data.items():
         with cols[counter % 3]:  # 在三栏中交替显示
             st.markdown(f"#### {time}", unsafe_allow_html=True)  # 小标题显示时间
             for date, locations in schedules.items():
