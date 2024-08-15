@@ -118,15 +118,14 @@ def query_subscription(phone_number):
 # 删除订阅
 def delete_subscription(subscription_id):
     with st.spinner("deleting subscription..."):
-        with FileLock(LOCK_FILE_PATH):
-            df = read_csv()
-            st.dataframe(df.head(100))
-            df = df[df["订阅ID"] != subscription_id]
-            st.dataframe(df.head(100))
-            write_csv(df)
+        df = read_csv()
+        st.dataframe(df.head(100))
+        df = df[df["订阅ID"] != subscription_id]
+        st.dataframe(df.head(100))
+        write_csv(df)
 
-
-# Streamlit 页面布局
+# Stream
+# lit 页面布局
 tab1, tab2 = st.tabs(["创建订阅", "查询订阅"])
 
 # 创建订阅 TAB
