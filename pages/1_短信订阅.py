@@ -166,13 +166,14 @@ st.write(st.session_state)
 
 # 查询订阅 TAB
 with tab2:
-    if st.session_state.del_subscription_id or st.query_params.get("del_subscription_id") :
+    if (st.session_state.del_subscription_id or st.query_params.get("del_subscription_id")) and st.session_state.phone_number:
         csv_file_path = f"{st.session_state.phone_number}_subscriptions.csv"
         delete_subscription(st.query_params.del_subscription_id, csv_file_path)
         st.success(f"订阅  {st.session_state.del_subscription_id} 已删除")
         st.session_state.del_subscription_id = ""
         st.query_params.del_subscription_id = ""
         st.rerun()
+        
     st.header("查询订阅")
     phone_number = st.text_input("输入手机", value=st.session_state.phone_number)
     st.session_state.phone_number = phone_number
