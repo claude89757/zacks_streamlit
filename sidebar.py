@@ -20,7 +20,7 @@ if not os.path.exists(DATA_FILE):
         "total_visits": 0,
         "monthly_visits": {},
         "daily_visits": {},
-        "users": set()
+        "users": []
     }
     with open(DATA_FILE, "w") as f:
         json.dump(data, f)
@@ -47,7 +47,6 @@ data["users"] = list(data["users"])  # Convert set to list for JSON serializatio
 with open(DATA_FILE, "w") as f:
     json.dump(data, f)
 
-
 # Sidebar component to display the statistics
 def sidebar():
     st.sidebar.subheader("App Statistics")
@@ -65,7 +64,7 @@ def sidebar():
     st.sidebar.metric("Total Visits", data['total_visits'])
 
     # Display total users
-    st.sidebar.metric("Total Users", len(data['users']))
+    st.sidebar.metric("Total Users", len(set(data['users'])))
 
     # Optionally, add a progress bar for monthly visits
     monthly_goal = 1000  # Example goal for monthly visits
@@ -77,4 +76,3 @@ def sidebar():
     st.sidebar.markdown("---")
     st.sidebar.markdown("**Keep up the good work!**")
     st.sidebar.markdown("Thank you for using our app.")
-
