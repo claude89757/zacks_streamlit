@@ -38,15 +38,22 @@ def delete_message(key):
         else:
             st.warning("只能删除1小时内的消息！")
 
+
 # 显示消息
 def display_messages(messages):
     cols = st.columns(2)  # 创建两列布局
     for index, message in enumerate(messages):
         col = cols[index % 2]  # 根据列数分配消息
         with col:
-            st.markdown(f"**{message['nickname']}**")
-            st.markdown(f"*{message['timestamp']}*")
-            st.markdown(f"> {message['message']}")
+            st.markdown(
+                f"""
+                <div style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; margin-bottom: 10px;">
+                    <strong>{message['nickname']}</strong><br>
+                    <em>{message['timestamp']}</em><br>
+                    <blockquote>{message['message']}</blockquote>
+                """,
+                unsafe_allow_html=True
+            )
 
             # 添加删除按钮
             if (datetime.now() - datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")) <= timedelta(hours=1):
@@ -54,8 +61,8 @@ def display_messages(messages):
                     delete_message(message['key'])
                     return
             else:
-                st.warning("**删除功能仅限1小时内的消息**")
-            st.markdown("---")
+                st.markdown("**删除功能仅限1小时内的消息**")
+            st.markdown("</div>", unsafe_allow_html=True)
 
 # 加载并显示消息
 messages = load_messages()
@@ -95,22 +102,10 @@ st.markdown(
         max-width: 400px;
         margin: auto;
     }
-    .column {
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        background-color: #f9f9f9;
-        margin-bottom: 10px;
-    }
     </style>
     """,
     unsafe_allow_html=True
 )
-
-# 使用卡片样式
-for i in range(2):
-    st.markdown('<div class="column">', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # 聊天室说明
 st.markdown(
