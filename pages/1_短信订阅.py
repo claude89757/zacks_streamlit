@@ -238,7 +238,7 @@ with tab2:
                         st.session_state.selected_subscription_id = None
                     st.session_state.selected_subscription_id = row["_id"]
                     # Only delete if button is clicked
-                    if st.button("删除订阅", key=f"delete_button_{index}"):
+                    if st.button("删除订阅", key=f"delete_button_{index}", type="primary"):
                         if st.session_state.selected_subscription_id:
                             delete_subscription(st.session_state.selected_subscription_id)
                             st.session_state.selected_subscription_id = None  # Clear the selection
