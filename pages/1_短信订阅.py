@@ -173,6 +173,7 @@ with tab1:
     with col8:
         subscription_data["name"] = st.text_input("昵称（可选）")
 
+    subscription_data["duration"] = int(subscription_data["duration"][0])
     subscription_data["start_date"] = subscription_data["start_date"].strftime("%Y-%m-%d")
     subscription_data["end_date"] = subscription_data["end_date"].strftime("%Y-%m-%d")
     subscription_data["start_time"] = subscription_data["start_time"].strftime("%H:%M")
