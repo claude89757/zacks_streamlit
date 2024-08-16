@@ -76,7 +76,7 @@ if not nickname:
     nickname = generate_random_alias()
 
 message = st.text_area("输入你的消息：", max_chars=500)
-uploaded_file = st.file_uploader("上传图片", type=["png", "jpg", "jpeg"])
+uploaded_file = st.file_uploader("上传图片（最大 2MB）", type=["png", "jpg", "jpeg"], label_visibility="collapsed")
 
 # 处理上传的图片
 image_url = None
@@ -102,7 +102,7 @@ if st.button("发送"):
         st.success("消息发送成功！")
         # 清空输入框和图片上传
         st.text_area("输入你的消息：", max_chars=500, value="", key="message")
-        st.file_uploader("上传图片", type=["png", "jpg", "jpeg"], key="file_uploader", label_visibility="hidden")
+        st.file_uploader("上传图片（最大 2MB）", type=["png", "jpg", "jpeg"], key="file_uploader", label_visibility="collapsed")
         st.rerun()
     else:
         st.warning("请输入消息或上传图片！")
