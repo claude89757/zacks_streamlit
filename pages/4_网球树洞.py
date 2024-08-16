@@ -38,7 +38,6 @@ def delete_message(key):
         else:
             st.warning("只能删除1小时内的消息！")
 
-
 # 显示消息
 def display_messages(messages):
     cols = st.columns(2)  # 创建两列布局
@@ -48,7 +47,7 @@ def display_messages(messages):
             st.markdown(
                 f"""
                 <div style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; margin-bottom: 10px;">
-                    <strong>{message['nickname']}</strong><br>
+                    <strong>🎾 {message['nickname']}</strong><br>
                     <em>{message['timestamp']}</em><br>
                     <blockquote>{message['message']}</blockquote>
                 """,
@@ -77,7 +76,7 @@ if not nickname:
 message = st.text_area("输入你的消息：", max_chars=500)
 
 # 提交消息
-if st.button("发送"):
+if st.button("发送", key="send_button", help="发送消息", use_container_width=True):
     if message:
         # 构建消息数据
         chat_message = {
@@ -88,7 +87,7 @@ if st.button("发送"):
         }
         redis_client.set_json_data(chat_message['key'], chat_message, timeout=86400 * 7)  # 保持消息7天
         st.success("消息发送成功！")
-        # 清空输入框
+        # 清空输入框，但保留昵称
         st.text_area("输入你的消息：", max_chars=500, value="", key="message")
         st.rerun()
     else:
@@ -101,6 +100,10 @@ st.markdown(
     .main {
         max-width: 400px;
         margin: auto;
+    }
+    button[data-baseweb="button"] {
+        font-size: 20px;
+        padding: 10px 20px;
     }
     </style>
     """,
