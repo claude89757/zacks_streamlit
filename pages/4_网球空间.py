@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import base64
 
 # 初始化RedisClient实例
-redis_client = RedisClient(db=1)
+redis_client = RedisClient(db=2)
 
 
 # 随机生成英文代号
