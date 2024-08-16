@@ -176,7 +176,7 @@ with tab1:
     subscription_data["status"] = "运行中"
     subscription_data["jrtzcs"] = 0
     subscription_data["zjtzcs"] = 0
-    subscription_data["sjwh"] = subscription_data["手机号"][-4:]
+    subscription_data["sjwh"] = subscription_data["phone"][-4:]
     subscription_data["user_level"] = "VIP"
     subscription_data["createdAt"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
