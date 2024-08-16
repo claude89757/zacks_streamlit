@@ -121,7 +121,8 @@ def create_subscription(data):
     st.write(type(data))
     st.write(data)
     subscription_list.append(data)
-
+    st.write(type(subscription_list))
+    st.write(subscription_list)
     # st.session_state.redis_client.set_json_data(REDIS_KEY, subscription_list, use_lock=True)
     time.sleep(10)
 
