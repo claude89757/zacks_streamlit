@@ -5,18 +5,21 @@ import uuid
 from common.redis_client import RedisClient
 from PIL import Image
 import io
-from datetime import datetime
+from datetime import datetime, timedelta
 import base64
 
 # 初始化RedisClient实例
 redis_client = RedisClient(db=1)
 
+
 # 随机生成英文代号
 def generate_random_alias():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
+
 # 页面标题
 st.title("🎾 网球聊天室")
+
 
 # 实时更新消息
 def load_messages():
@@ -25,6 +28,20 @@ def load_messages():
         sorted_comments = sorted(comments.values(), key=lambda x: x['timestamp'], reverse=True)
         return sorted_comments
     return []
+
+
+# 删除消息
+def delete_message(key):
+    # 获取消息时间
+    message = redis_client.get_json_data(key)
+    if message:
+        message_time = datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")
+        if datetime.now() - message_time <= timedelta(hours=1):
+            redis_client.delete_data(key)
+            st.experimental_rerun()  # 删除消息后刷新页面
+        else:
+            st.warning("只能删除1小时内的消息！")
+
 
 # 显示消息
 def display_messages(messages):
@@ -37,7 +54,16 @@ def display_messages(messages):
             st.markdown(f"> {message['message']}")
             if message['image_url']:
                 st.image(message['image_url'], use_column_width=True)
+
+            # 添加删除按钮
+            if (datetime.now() - datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")) <= timedelta(hours=1):
+                if st.button("删除", key=f"delete_{index}"):
+                    delete_message(message['key'])
+                    return
+            else:
+                st.markdown("**删除功能仅限1小时内的消息**")
             st.markdown("---")
+
 
 # 加载并显示消息
 messages = load_messages()
@@ -69,9 +95,10 @@ if st.button("发送"):
             "nickname": nickname,
             "message": message,
             "image_url": image_url,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "key": f"chat:{uuid.uuid4()}"
         }
-        redis_client.set_json_data(f"chat:{uuid.uuid4()}", chat_message, timeout=86400 * 7)  # 保持消息7天
+        redis_client.set_json_data(chat_message['key'], chat_message, timeout=86400 * 7)  # 保持消息7天
         st.success("消息发送成功！")
         # 清空输入框和图片上传
         st.text_area("输入你的消息：", max_chars=500, value="", key="message")
