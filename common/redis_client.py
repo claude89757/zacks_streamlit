@@ -13,14 +13,15 @@ import json
 import time
 import uuid
 from datetime import datetime
+import streamlit as st
 
 
 class RedisClient:
     def __init__(self, db=0):
         self.redis_conn = redis.Redis(
-            host=os.environ['REDIS_HOST'],
-            port=os.environ['REDIS_PORT'],
-            password=os.environ['REDIS_PASSWORD'],
+            host=st.secrets["DB"]['REDIS_HOST'],
+            port=st.secrets["DB"]['REDIS_PORT'],
+            password=st.secrets["DB"]['REDIS_PASSWORD'],
             db=db,
             decode_responses=True  # 自动解码为字符串
         )
