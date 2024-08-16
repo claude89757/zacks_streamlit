@@ -13,6 +13,7 @@ from filelock import FileLock
 import streamlit as st
 from common.log_config import setup_logger
 from common.settings import common_settings_init
+from common.redis_client import RedisClient
 from sidebar import sidebar
 import uuid
 
@@ -34,6 +35,8 @@ st.title("空场短信提醒")
 # 初始化 session state
 if 'phone_number' not in st.session_state:
     st.session_state.phone_number = ''
+if "redis_client" not in st.session_state:
+    st.session_state.redis_client = RedisClient()
 
 # 订阅的字段
 FIELDS = [
@@ -48,65 +51,98 @@ VENUE_OPTIONS = [
     '山花馆', '九龙山', '网羽中心'
 ]
 
+
+KEY_MAPPING = {
+    'owner': '拥有者',
+    'end_date': '结束日期',
+    'jrtzcs': '今日通知次数',
+    'tzgq': '通知过期',
+    '_departmentList': '部门列表',
+    'end_time': '结束时间',
+    'cdhm': '场地号',
+    'xjcd': '订阅场地',
+    'duration': '时长',
+    'createdAt': '创建时间',
+    'start_time': '开始时间',
+    'sfsd': '是否收到',
+    'createBy': '创建者',
+    'updateBy': '更新者',
+    'phone': '手机号码',
+    'name': '昵称',
+    'user_level': '用户等级',
+    '_id': '订阅ID',
+    'sjwh': '手机尾号',
+    'zjtzcs': '总计通知次数',
+    'updatedAt': '更新时间',
+    'start_date': '开始日期',
+    'status': '状态'
+}
+
+
+REVERSE_KEY_MAPPING = {
+    '拥有者': 'owner',
+    '结束日期': 'end_date',
+    '今日通知次数': 'jrtzcs',
+    '通知过期': 'tzgq',
+    '部门列表': '_departmentList',
+    '结束时间': 'end_time',
+    '场地号': 'cdhm',
+    '订阅场地': 'xjcd',
+    '时长': 'duration',
+    '创建时间': 'createdAt',
+    '开始时间': 'start_time',
+    '是否收到': 'sfsd',
+    '创建者': 'createBy',
+    '更新者': 'updateBy',
+    '手机号码': 'phone',
+    '昵称': 'name',
+    '用户等级': 'user_level',
+    '订阅ID': '_id',
+    '手机尾号': 'sjwh',
+    '总计通知次数': 'zjtzcs',
+    '更新时间': 'updatedAt',
+    '开始日期': 'start_date',
+    '状态': 'status'
+}
+
+
 # 最短时长选项
 DURATION_OPTIONS = ['1小时', '2小时', '3小时']
 
-CSV_FILE_PATH = "subscriptions.csv"
-LOCK_FILE_PATH = "subscriptions.lock"
-
-# 文件锁
-lock = FileLock(LOCK_FILE_PATH)
-
-
-# 读取 CSV 文件
-def read_csv(CSV_FILE_PATH):
-    with lock:
-        # 检查 CSV 文件是否存在，如果不存在则创建
-        if not os.path.exists(CSV_FILE_PATH):
-            df = pd.DataFrame(columns=FIELDS)
-            df.to_csv(CSV_FILE_PATH, index=False)
-        return pd.read_csv(CSV_FILE_PATH)
-
-
-# 写入 CSV 文件
-def write_csv(df):
-    with lock:
-        df.to_csv(CSV_FILE_PATH, index=False)
+# Redis 键名
+REDIS_KEY = "subscriptions"
 
 
 # 创建订阅
-def create_subscription(data, CSV_FILE_PATH):
+def create_subscription(data):
     with st.spinner("creating subscription..."):
-        df = read_csv(CSV_FILE_PATH)
-        data["订阅ID"] = str(uuid.uuid4())  # 生成唯一的订阅ID
-        new_row = pd.DataFrame([data])
-        df = pd.concat([df, new_row], ignore_index=True)
-        write_csv(df)
+        data["_id"] = str(uuid.uuid4())  # 生成唯一的订阅ID
+        subscription_list = st.session_state.redis_client.get_json_data(REDIS_KEY, use_lock=True) or []
+        subscription_list.append(data)
+        st.session_state.redis_client.set_json_data(REDIS_KEY, subscription_list, use_lock=True)
         time.sleep(1)
 
 
 # 查询订阅
-def query_subscription(phone_number, CSV_FILE_PATH):
+def query_subscription(phone_number):
     with st.spinner("querying subscription..."):
-        df = read_csv(CSV_FILE_PATH)
-        df["手机号"] = df["手机号"].astype(str)  # 确保手机号列为字符串类型
-        results = df[df["手机号"].str.contains(phone_number)]
+        subscription_list = st.session_state.redis_client.get_json_data(REDIS_KEY) or []
+        results = [sub for sub in subscription_list if sub["phone"].startswith(phone_number)]
         time.sleep(1)
         return results
 
 
 # 删除订阅
-def delete_subscription(subscription_id, CSV_FILE_PATH):
+def delete_subscription(subscription_id):
     with st.spinner("deleting subscription..."):
-        df = read_csv(CSV_FILE_PATH)
-        df = df[df["订阅ID"] != subscription_id]
-        write_csv(df)
+        subscription_list = st.session_state.redis_client.get_json_data(REDIS_KEY) or []
+        subscription_list = [sub for sub in subscription_list if sub["_id"] != subscription_id]
+        st.session_state.redis_client.set_json_data(REDIS_KEY, subscription_list, use_lock=True)
         time.sleep(1)
 
 
 # 页面布局
 tab1, tab2 = st.tabs(["创建订阅", "查询订阅"])
-
 
 # 创建订阅 TAB
 with tab1:
@@ -115,46 +151,46 @@ with tab1:
 
     col1, col2 = st.columns(2)
     with col1:
-        subscription_data["订阅场地"] = st.selectbox("订阅场地", VENUE_OPTIONS)
+        subscription_data["xjcd"] = st.selectbox("订阅场地", VENUE_OPTIONS)
     with col2:
-        subscription_data["最短时长"] = st.selectbox("最短时长", DURATION_OPTIONS)
+        subscription_data["duration"] = st.selectbox("最短时长", DURATION_OPTIONS)
 
     col3, col4 = st.columns(2)
     with col3:
-        subscription_data["开始日期"] = st.date_input("开始日期")
+        subscription_data["start_date"] = st.date_input("开始日期")
     with col4:
-        subscription_data["结束日期"] = st.date_input("结束日期")
+        subscription_data["end_date"] = st.date_input("结束日期")
 
     col5, col6 = st.columns(2)
     with col5:
-        subscription_data["开始时间"] = st.time_input("开始时间", value=pd.to_datetime("18:00").time())
+        subscription_data["start_time"] = st.time_input("开始时间", value=pd.to_datetime("18:00").time())
     with col6:
-        subscription_data["结束时间"] = st.time_input("结束时间", value=pd.to_datetime("22:00").time())
+        subscription_data["end_time"] = st.time_input("结束时间", value=pd.to_datetime("22:00").time())
 
     col7, col8 = st.columns(2)
     with col7:
-        subscription_data["手机号"] = st.text_input("手机号", value=st.session_state.phone_number)
+        subscription_data["phone"] = st.text_input("手机号", value=st.session_state.phone_number)
     with col8:
-        subscription_data["昵称"] = st.text_input("昵称（可选）")
+        subscription_data["name"] = st.text_input("昵称（可选）")
 
-    subscription_data["订阅状态"] = "运行中"
-    subscription_data["今天短信"] = "-"
-    subscription_data["累计短信"] = "-"
-    subscription_data["手机尾号"] = subscription_data["手机号"][-4:]
-    subscription_data["用户等级"] = "VIP"
-    subscription_data["创建时间"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    subscription_data["status"] = "运行中"
+    subscription_data["jrtzcs"] = 0
+    subscription_data["zjtzcs"] = 0
+    subscription_data["sjwh"] = subscription_data["手机号"][-4:]
+    subscription_data["user_level"] = "VIP"
+    subscription_data["createdAt"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
     # 提交按钮
     if st.button("创建订阅", key="submit_button", help="点击提交订阅信息", type="primary"):
         # 手机号验证
-        if not subscription_data["手机号"].isdigit() or len(subscription_data["手机号"]) != 11:
+        if not subscription_data["phone"].isdigit() or len(subscription_data["phone"]) != 11:
             st.error("请输入有效的11位手机号")
         else:
             # 统计数据
             sidebar()
-            # CSV 文件路径
-            create_subscription(subscription_data, CSV_FILE_PATH)
-            value = st.session_state.phone_number = subscription_data["手机号"]
+            # Redis 操作
+            create_subscription(subscription_data)
+            value = st.session_state.phone_number = subscription_data["phone"]
             st.balloons()
             st.success("订阅创建成功！请关注手机短信提醒。")
 
@@ -172,34 +208,34 @@ with tab2:
         else:
             pass
     if st.session_state.phone_number:
-        results = query_subscription(st.session_state.phone_number, CSV_FILE_PATH)
-        if results.empty:
+        results = query_subscription(st.session_state.phone_number)
+        if not results:
             st.warning("未找到相关订阅信息，请检查手机号是否正确。")
         else:
-            for index, row in results.iterrows():
+            for index, row in enumerate(results):
                 col1, col2 = st.columns(2)
                 with col1:
-                    with st.expander(f"订阅 {index + 1}: {row['订阅场地']} {row['订阅状态']}"):
-                        st.write(f"**开始日期**: {row['开始日期']}")
-                        st.write(f"**结束日期**: {row['结束日期']}")
-                        st.write(f"**开始时间**: {row['开始时间']}")
-                        st.write(f"**结束时间**: {row['结束时间']}")
-                        st.write(f"**最短时长**: {row['最短时长']}")
-                        st.write(f"**今天短信**: {row['今天短信']}")
-                        st.write(f"**累计短信**: {row['累计短信']}")
-                        st.write(f"**手机尾号**: {row['手机尾号']}")
-                        st.write(f"**用户等级**: {row['用户等级']}")
-                        st.write(f"**创建时间**: {row['创建时间']}")
-                        st.write(f"**昵称**: {row['昵称']}")
+                    with st.expander(f"订阅 {index + 1}: {row['xjcd']} {row['status']}"):
+                        st.write(f"**开始日期**: {row['start_date']}")
+                        st.write(f"**结束日期**: {row['end_date']}")
+                        st.write(f"**开始时间**: {row['start_time']}")
+                        st.write(f"**结束时间**: {row['end_time']}")
+                        st.write(f"**最短时长**: {row['duration']}")
+                        st.write(f"**今天短信**: {row['jrtzcs']}")
+                        st.write(f"**累计短信**: {row['zjtzcs']}")
+                        st.write(f"**手机尾号**: {row['sjwh']}")
+                        st.write(f"**用户等级**: {row['user_level']}")
+                        st.write(f"**创建时间**: {row['createdAt']}")
+                        st.write(f"**昵称**: {row['name']}")
 
                 with col2:
                     if 'selected_subscription_id' not in st.session_state:
                         st.session_state.selected_subscription_id = None
-                    st.session_state.selected_subscription_id = row["订阅ID"]
+                    st.session_state.selected_subscription_id = row["_id"]
                     # Only delete if button is clicked
                     if st.button("删除订阅", key=f"delete_button_{index}"):
                         if st.session_state.selected_subscription_id:
-                            delete_subscription(st.session_state.selected_subscription_id, CSV_FILE_PATH)
+                            delete_subscription(st.session_state.selected_subscription_id)
                             st.session_state.selected_subscription_id = None  # Clear the selection
                             st.success("订阅删除成功！")
-                            st.rerun()  # Refresh page to update subscription list
+                            st.rerun()  # Refresh page to update subscription lis
