@@ -56,7 +56,7 @@ def display_messages(messages):
             )
 
             # 添加删除按钮
-            if (datetime.now() - datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")) <= timedelta(minutes=15):
+            if (datetime.now() - datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")) <= timedelta(minutes=10):
                 if st.button("删除", key=f"delete_{index}"):
                     delete_message(message['key'])
                     return
