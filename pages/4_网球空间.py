@@ -38,7 +38,7 @@ def delete_message(key):
         message_time = datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")
         if datetime.now() - message_time <= timedelta(hours=1):
             redis_client.delete_data(key)
-            st.experimental_rerun()  # 删除消息后刷新页面
+            st.rerun()  # 删除消息后刷新页面
         else:
             st.warning("只能删除1小时内的消息！")
 
@@ -103,7 +103,7 @@ if st.button("发送"):
         # 清空输入框和图片上传
         st.text_area("输入你的消息：", max_chars=500, value="", key="message")
         st.file_uploader("上传图片", type=["png", "jpg", "jpeg"], key="file_uploader", label_visibility="hidden")
-        st.experimental_rerun()
+        st.rerun()
     else:
         st.warning("请输入消息或上传图片！")
 
