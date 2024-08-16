@@ -73,9 +73,7 @@ def sidebar():
     st.sidebar.metric("Total Users", len(set(data['users'])))
 
     # Optionally, add a progress bar for monthly visits
-    monthly_goal = 1000  # Example goal for monthly visits
-    monthly_visits = data['monthly_visits'].get(current_month, 0)
-    progress = min(monthly_visits / monthly_goal, 1.0)
+    progress = min(len(set(data['users'])) / 1000, 1.0)
     st.sidebar.progress(progress)
 
     # Add some additional styling or information if needed

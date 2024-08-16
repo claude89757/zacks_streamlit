@@ -8,6 +8,9 @@ import io
 from datetime import datetime, timedelta
 import base64
 
+from sidebar import sidebar
+
+
 # 初始化RedisClient实例
 redis_client = RedisClient(db=2)
 
@@ -18,6 +21,8 @@ def generate_random_alias():
 # 页面标题
 st.title("🎾 网球树洞")
 st.markdown("Tennis only")
+
+sidebar()
 
 # 实时更新消息
 def load_messages():
