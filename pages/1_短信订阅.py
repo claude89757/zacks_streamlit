@@ -115,12 +115,12 @@ REDIS_KEY = "subscriptions"
 
 # 创建订阅
 def create_subscription(data):
-    # with st.spinner("creating subscription..."):
-    data["_id"] = str(uuid.uuid4())  # 生成唯一的订阅ID
-    subscription_list = st.session_state.redis_client.get_json_data(REDIS_KEY, use_lock=True) or []
-    subscription_list.append(data)
-    st.session_state.redis_client.set_json_data(REDIS_KEY, subscription_list, use_lock=True)
-    time.sleep(10)
+    with st.spinner("creating subscription..."):
+        data["_id"] = str(uuid.uuid4())  # 生成唯一的订阅ID
+        subscription_list = st.session_state.redis_client.get_json_data(REDIS_KEY, use_lock=True) or []
+        subscription_list.append(data)
+        st.session_state.redis_client.set_json_data(REDIS_KEY, subscription_list, use_lock=True)
+        time.sleep(3)
 
 
 # 查询订阅
