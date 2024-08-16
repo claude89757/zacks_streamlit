@@ -11,6 +11,7 @@ import requests
 import json
 from datetime import datetime, timedelta
 import streamlit as st
+from common.redis_client import RedisClient
 
 COURT_NAME_INFOS = {
     # z香蜜
@@ -75,11 +76,8 @@ def set_realtime_tennis_court_sheet():
     查询场地数据
     :return:
     """
-    api_url = f"http://{st.secrets['ZACKS']['TENNIS_HELPER_HOST_IP']}:5000/api/files"
-
-    # Fetch data from API
-    response = requests.get(api_url, timeout=10)
-    data = response.json()
+    # Fetch data
+    data = RedisClient().get_json_data("tennis_court_infos")
 
     # Get today's date and current time
     today = datetime.today()
@@ -98,11 +96,7 @@ def set_realtime_tennis_court_sheet():
     table_data = {time_slot: {date: '' for date in date_range} for time_slot in time_slots}
 
     # Process each file's content
-    for file in data:
-        content = json.loads(file['content'])
-        filename = file['filename']
-        court_name = filename.replace('/root/', '').replace('_available_court.txt', '')
-
+    for court_name, content in data.items():
         for date, courts in content.items():
             if date in date_range:
                 for court_index, slots in courts.items():
