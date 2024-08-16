@@ -76,25 +76,14 @@ if not nickname:
     nickname = generate_random_alias()
 
 message = st.text_area("输入你的消息：", max_chars=500)
-uploaded_file = st.file_uploader("上传图片（最大 2MB）", type=["png", "jpg", "jpeg"], label_visibility="collapsed")
-
-# 处理上传的图片
-image_url = None
-if uploaded_file:
-    image = Image.open(uploaded_file)
-    image_bytes = io.BytesIO()
-    image.save(image_bytes, format='PNG')
-    image_data = image_bytes.getvalue()
-    image_url = f"data:image/png;base64,{base64.b64encode(image_data).decode()}"
 
 # 提交消息
 if st.button("发送"):
-    if message or image_url:
+    if message:
         # 构建消息数据
         chat_message = {
             "nickname": nickname,
             "message": message,
-            "image_url": image_url,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "key": f"chat:{uuid.uuid4()}"
         }
@@ -102,7 +91,6 @@ if st.button("发送"):
         st.success("消息发送成功！")
         # 清空输入框和图片上传
         st.text_area("输入你的消息：", max_chars=500, value="", key="message")
-        st.file_uploader("上传图片（最大 2MB）", type=["png", "jpg", "jpeg"], key="file_uploader", label_visibility="collapsed")
         st.rerun()
     else:
         st.warning("请输入消息或上传图片！")
