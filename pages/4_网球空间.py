@@ -47,14 +47,14 @@ def display_messages(messages):
             st.markdown(f"**{message['nickname']}**")
             st.markdown(f"*{message['timestamp']}*")
             st.markdown(f"> {message['message']}")
-            
+
             # 添加删除按钮
             if (datetime.now() - datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")) <= timedelta(hours=1):
                 if st.button("删除", key=f"delete_{index}"):
                     delete_message(message['key'])
                     return
             else:
-                st.markdown("**删除功能仅限1小时内的消息**")
+                st.warning("**删除功能仅限1小时内的消息**")
             st.markdown("---")
 
 # 加载并显示消息
