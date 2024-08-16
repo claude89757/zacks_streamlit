@@ -16,7 +16,8 @@ def generate_random_alias():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
 # 页面标题
-st.title("🎾 网球聊天室")
+st.title("🎾 网球树洞")
+st.markdown("Tennis only")
 
 # 实时更新消息
 def load_messages():
@@ -55,7 +56,7 @@ def display_messages(messages):
             )
 
             # 添加删除按钮
-            if (datetime.now() - datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")) <= timedelta(hours=1):
+            if (datetime.now() - datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")) <= timedelta(minutes=15):
                 if st.button("删除", key=f"delete_{index}"):
                     delete_message(message['key'])
                     return
@@ -76,7 +77,7 @@ if not nickname:
 message = st.text_area("输入你的消息：", max_chars=500)
 
 # 提交消息
-if st.button("发送", key="send_button", help="发送消息", use_container_width=True):
+if st.button("发送", key="send_button", help="发送消息", use_container_width=True, type="primary"):
     if message:
         # 构建消息数据
         chat_message = {
