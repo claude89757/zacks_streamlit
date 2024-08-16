@@ -60,14 +60,14 @@ def sidebar():
     # Create columns for a more compact layout
     col1, col2 = st.sidebar.columns(2)
 
-    # Display today's visits
-    col1.metric("Today's Visits", data['daily_visits'].get(current_date, 0))
-
-    # Display monthly visits
-    col2.metric("Monthly Visits", data['monthly_visits'].get(current_month, 0))
-
-    # Display total visits
-    st.sidebar.metric("Total Visits", data['total_visits'])
+    # # Display today's visits
+    # col1.metric("Today's Visits", data['daily_visits'].get(current_date, 0))
+    #
+    # # Display monthly visits
+    # col2.metric("Monthly Visits", data['monthly_visits'].get(current_month, 0))
+    #
+    # # Display total visits
+    # st.sidebar.metric("Total Visits", data['total_visits'])
 
     # Display total users
     st.sidebar.metric("Total Users", len(set(data['users'])))
