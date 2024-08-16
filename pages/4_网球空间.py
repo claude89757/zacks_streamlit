@@ -11,7 +11,7 @@ import streamlit as st
 import random
 import string
 import uuid
-from redis_client import RedisClient
+from common.redis_client import RedisClient
 from PIL import Image
 import io
 from datetime import datetime
