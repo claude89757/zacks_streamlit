@@ -79,8 +79,6 @@ def set_realtime_tennis_court_sheet():
     # Fetch data
     data = RedisClient().get_json_data("tennis_court_infos")
 
-    st.write(data)
-
     # Get today's date and current time
     today = datetime.today()
     today_str = today.strftime("%Y-%m-%d")
