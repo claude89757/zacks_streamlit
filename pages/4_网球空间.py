@@ -47,9 +47,7 @@ def display_messages(messages):
             st.markdown(f"**{message['nickname']}**")
             st.markdown(f"*{message['timestamp']}*")
             st.markdown(f"> {message['message']}")
-            if message['image_url']:
-                st.image(message['image_url'], use_column_width=True)
-
+            
             # 添加删除按钮
             if (datetime.now() - datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")) <= timedelta(hours=1):
                 if st.button("删除", key=f"delete_{index}"):
