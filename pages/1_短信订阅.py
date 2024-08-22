@@ -132,6 +132,14 @@ def query_subscription(phone_number):
         return results
 
 
+# 查询订阅
+def query_all_subscriptions():
+    with st.spinner("querying subscription..."):
+        subscription_list = st.session_state.redis_client.get_json_data(REDIS_KEY) or []
+        time.sleep(1)
+        return subscription_list
+
+
 # 删除订阅
 def delete_subscription(subscription_id):
     with st.spinner("deleting subscription..."):
@@ -212,6 +220,7 @@ with tab2:
             st.rerun()
         else:
             pass
+
     if st.session_state.phone_number:
         results = query_subscription(st.session_state.phone_number)
         if not results:
@@ -243,4 +252,19 @@ with tab2:
                             delete_subscription(st.session_state.selected_subscription_id)
                             st.session_state.selected_subscription_id = None  # Clear the selection
                             st.success("订阅删除成功！")
-                            st.rerun()  # Refresh page to update subscription lis
+                            st.rerun()  # Refresh page to update subscription list
+    else:
+        # 如果没有输入手机号，展示全量订阅列表
+        all_subscriptions = query_all_subscriptions()  # 假设这个函数返回全量订阅列表
+        if not all_subscriptions:
+            st.warning("未找到任何订阅信息。")
+        else:
+            # 将订阅信息转换为DataFrame
+            import pandas as pd
+            df = pd.DataFrame(all_subscriptions)
+            # 选择需要展示的列并转换为中文标题
+            df = df[["xjcd", "status", "start_date", "end_date", "start_time", "end_time", "duration",
+                     "jrtzcs", "zjtzcs", "sjwh", "user_level", "createdAt", "name"]]
+            df.columns = ["巡检场地", "状态", "开始日期", "结束日期", "开始时间", "结束时间", "最短时长",
+                          "今天短信", "累计短信", "手机尾号", "用户等级", "创建时间", "昵称"]
+            st.dataframe(df)
