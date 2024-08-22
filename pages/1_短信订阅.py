@@ -260,7 +260,7 @@ with tab2:
             st.warning("未找到任何订阅信息。")
         else:
             # 将订阅信息转换为DataFrame
-            import pandas as pd
+            st.markdown(f"> 当前订阅数量: {len(all_subscriptions)}")
             df = pd.DataFrame(all_subscriptions)
             # 选择需要展示的列并转换为中文标题
             df = df[["xjcd", "status", "start_date", "end_date", "start_time", "end_time", "duration",
