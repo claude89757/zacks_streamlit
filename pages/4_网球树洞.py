@@ -61,12 +61,13 @@ def display_messages(messages):
             )
 
             # 添加删除按钮
-            if (datetime.now() - datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")) <= timedelta(minutes=10):
+            if (datetime.now() - datetime.strptime(message['timestamp'], "%Y-%m-%d %H:%M:%S")) <= timedelta(minutes=30):
                 if st.button("删除", key=f"delete_{index}"):
                     delete_message(message['key'])
                     return
             else:
-                st.markdown("**删除功能仅限1小时内的消息**")
+                pass
+                # st.markdown("**删除功能仅限1小时内的消息**")
             st.markdown("</div>", unsafe_allow_html=True)
 
 # 加载并显示消息
