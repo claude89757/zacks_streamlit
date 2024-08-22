@@ -99,31 +99,9 @@ if st.button("发送", key="send_button", help="发送消息", use_container_wid
     else:
         st.warning("请输入消息！")
 
-# 设置页面布局为适合手机端使用
-st.markdown(
-    """
-    <style>
-    .main {
-        max-width: 400px;
-        margin: auto;
-    }
-    button[data-baseweb="button"] {
-        font-size: 20px;
-        padding: 10px 20px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # 聊天室说明
-st.markdown(
-    """
-    <footer style="text-align: center; margin-top: 20px; font-size: 14px; color: #888;">
-        **聊天室说明**<br>
-        1. 匿名聊天，请文明发言。<br>
-        2. 聊天消息仅保留7天。<br>
-    </footer>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("""
+**聊天室说明**<br>
+1. 匿名聊天，请文明发言。<br>
+2. 聊天消息仅保留7天。<br>
+""", unsafe_allow_html=True)
