@@ -119,7 +119,7 @@ def create_subscription(data):
         data["_id"] = str(uuid.uuid4())  # 生成唯一的订阅ID
         subscription_list = st.session_state.redis_client.get_json_data(REDIS_KEY, use_lock=True) or []
         subscription_list.append(data)
-        st.session_state.redis_client.set_json_data(REDIS_KEY, subscription_list, use_lock=True)
+        st.session_state.redis_client.set_json_data(REDIS_KEY, subscription_list, use_lock=True, timeout=604800)
         time.sleep(3)
 
 
