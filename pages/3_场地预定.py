@@ -36,7 +36,7 @@ html_code = f"""
     <p>If you are not redirected automatically, follow this <a href="{target_url}">link to the target page</a>.</p>
 """
 
-st.warning("正在跳转至订场页面...")
-time.sleep(3)
-# 在Streamlit中显示HTML代码
-st.markdown(html_code, unsafe_allow_html=True)
+with st.spinner("正在进入订场页面..."):
+    time.sleep(3)
+    # 在Streamlit中显示HTML代码
+    st.markdown(html_code, unsafe_allow_html=True)
