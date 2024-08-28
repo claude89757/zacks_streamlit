@@ -21,6 +21,18 @@ sidebar()
 
 # 提供外部网页的链接
 st.title("场地预定")
-url = "https://wxsports.ydmap.cn/venue/"
 
-st.markdown(f"[点击这里访问场地预定页面]({url})", unsafe_allow_html=True)
+# 目标URL
+target_url = "https://wxsports.ydmap.cn/venue/"
+
+# 使用HTML和JavaScript实现自动跳转
+html_code = f"""
+    <meta http-equiv="refresh" content="0; url={target_url}" />
+    <script type="text/javascript">
+        window.location.href = "{target_url}";
+    </script>
+    <p>If you are not redirected automatically, follow this <a href="{target_url}">link to the target page</a>.</p>
+"""
+
+# 在Streamlit中显示HTML代码
+st.markdown(html_code, unsafe_allow_html=True)
