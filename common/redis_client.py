@@ -100,7 +100,7 @@ class RedisClient:
 
         try:
             json_data = json.dumps(value)
-            self.redis_conn.set(key, json_data, ex=timeout, keepttl=True)
+            self.redis_conn.set(key, json_data, ex=timeout)
             self._print_with_timestamp(f"Set JSON data for key '{key}' with length {len(value)} "
                                        f"and timeout {timeout} seconds")
         finally:
